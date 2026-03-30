@@ -23,15 +23,13 @@ export default async function LocaleLayout({
   const isRtl = locale === 'ar';
 
   return (
-    <html lang={locale} dir={isRtl ? 'rtl' : 'ltr'} suppressHydrationWarning>
-      <body className="min-h-screen antialiased">
-        <SessionProvider>
-          <NextIntlClientProvider messages={messages}>
-            <AppShell>{children}</AppShell>
-            <Toaster />
-          </NextIntlClientProvider>
-        </SessionProvider>
-      </body>
-    </html>
+    <div lang={locale} dir={isRtl ? 'rtl' : 'ltr'} className="min-h-screen antialiased">
+      <SessionProvider>
+        <NextIntlClientProvider messages={messages}>
+          <AppShell>{children}</AppShell>
+          <Toaster />
+        </NextIntlClientProvider>
+      </SessionProvider>
+    </div>
   );
 }
