@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { getModulesForRole } from '@/lib/rbac';
 import { UserRole } from '@prisma/client';
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {

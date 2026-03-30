@@ -7,6 +7,7 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { saleSchema } from '@/lib/validations/sale';
 import { calculateGrossProfit } from '@/lib/calculations';
 import Decimal from 'decimal.js';
+export const dynamic = 'force-dynamic';
 
 type RouteContext = { params: Promise<{ id: string }> };
 

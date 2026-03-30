@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import { checkPermission } from '@/lib/rbac';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import Decimal from 'decimal.js';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {

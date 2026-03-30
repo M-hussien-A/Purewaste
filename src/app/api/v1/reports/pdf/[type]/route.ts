@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { checkPermission } from '@/lib/rbac';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import Decimal from 'decimal.js';
+export const dynamic = 'force-dynamic';
 
 type RouteContext = { params: Promise<{ type: string }> };
 

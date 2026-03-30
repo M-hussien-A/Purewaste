@@ -13,6 +13,7 @@ import {
   calculateCostPerKg,
 } from '@/lib/calculations';
 import Decimal from 'decimal.js';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {

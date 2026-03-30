@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import { checkPermission } from '@/lib/rbac';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import Decimal from 'decimal.js';
+export const dynamic = 'force-dynamic';
 
 interface Alert {
   type: 'LOW_STOCK_RAW' | 'LOW_STOCK_FINISHED' | 'OVERDUE_SUPPLIER_PAYMENT' | 'OVERDUE_CUSTOMER_PAYMENT';

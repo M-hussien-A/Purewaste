@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { checkPermission } from '@/lib/rbac';
 import { successResponse, errorResponse, paginatedResponse } from '@/lib/api-response';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {

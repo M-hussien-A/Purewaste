@@ -5,6 +5,7 @@ import { checkPermission } from '@/lib/rbac';
 import { logAction } from '@/lib/audit';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import bcrypt from 'bcryptjs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {

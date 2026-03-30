@@ -7,6 +7,7 @@ import { successResponse, errorResponse, paginatedResponse } from '@/lib/api-res
 import { saleSchema } from '@/lib/validations/sale';
 import { calculateGrossProfit } from '@/lib/calculations';
 import Decimal from 'decimal.js';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {

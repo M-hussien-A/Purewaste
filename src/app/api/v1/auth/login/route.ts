@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import prisma from '@/lib/prisma';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { logAction } from '@/lib/audit';
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {

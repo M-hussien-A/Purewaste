@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { checkPermission } from '@/lib/rbac';
 import { logAction } from '@/lib/audit';
 import { successResponse, errorResponse } from '@/lib/api-response';
+export const dynamic = 'force-dynamic';
 
 type RouteContext = { params: Promise<{ id: string }> };
 

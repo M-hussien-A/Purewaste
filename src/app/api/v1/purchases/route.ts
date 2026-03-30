@@ -7,6 +7,7 @@ import { successResponse, errorResponse, paginatedResponse } from '@/lib/api-res
 import { purchaseSchema } from '@/lib/validations/purchase';
 import { calculateWeightedAverage } from '@/lib/calculations';
 import Decimal from 'decimal.js';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
