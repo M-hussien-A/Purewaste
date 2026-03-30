@@ -11,7 +11,7 @@ import { Menu, Sun, Moon, Monitor, Languages } from 'lucide-react';
 
 export function TopNav() {
   const locale = useLocale();
-  const t = useTranslations('settings');
+  const t = useTranslations('theme');
   const router = useRouter();
   const pathname = usePathname();
   const { toggle } = useSidebarStore();
