@@ -63,43 +63,50 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       return errorResponse('VALIDATION_ERROR', 'Invalid input', validation.error.flatten(), 400);
     }
 
-    const { date, supplierId, materialId, quantity, unitPrice, notes } = validation.data;
+    const { date, category, description, supplierId, materialId, quantity, unitPrice, notes } = validation.data;
     const totalCost = new Decimal(quantity).mul(new Decimal(unitPrice));
+    const isRawMaterial = category === 'RAW_MATERIAL' && materialId;
 
     const result = await prisma.$transaction(async (tx) => {
       const existing = await tx.purchase.findUniqueOrThrow({ where: { id } });
 
-      // Reverse the old inventory effect
-      await tx.rawMaterial.update({
-        where: { id: existing.materialId },
-        data: {
-          currentStock: { decrement: existing.quantity },
-        },
-      });
+      // Reverse old inventory effect if it was a raw material purchase
+      if (existing.materialId) {
+        await tx.rawMaterial.update({
+          where: { id: existing.materialId },
+          data: {
+            currentStock: { decrement: existing.quantity },
+          },
+        });
+      }
 
-      // Apply new inventory effect
-      const material = await tx.rawMaterial.findUniqueOrThrow({ where: { id: materialId } });
-      const newAvgCost = calculateWeightedAverage(
-        material.currentStock.toString(),
-        material.avgCostPerKg.toString(),
-        quantity,
-        unitPrice
-      );
+      // Apply new inventory effect if new purchase is raw material
+      if (isRawMaterial) {
+        const material = await tx.rawMaterial.findUniqueOrThrow({ where: { id: materialId } });
+        const newAvgCost = calculateWeightedAverage(
+          material.currentStock.toString(),
+          material.avgCostPerKg.toString(),
+          quantity,
+          unitPrice
+        );
 
-      await tx.rawMaterial.update({
-        where: { id: materialId },
-        data: {
-          currentStock: { increment: new Decimal(quantity) },
-          avgCostPerKg: newAvgCost,
-        },
-      });
+        await tx.rawMaterial.update({
+          where: { id: materialId },
+          data: {
+            currentStock: { increment: new Decimal(quantity) },
+            avgCostPerKg: newAvgCost,
+          },
+        });
+      }
 
       const updated = await tx.purchase.update({
         where: { id },
         data: {
           date: new Date(date),
-          supplierId,
-          materialId,
+          category,
+          description: description || null,
+          supplierId: supplierId || null,
+          materialId: isRawMaterial ? materialId : null,
           quantity: new Decimal(quantity),
           unitPrice: new Decimal(unitPrice),
           totalCost,
@@ -144,20 +151,20 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     const result = await prisma.$transaction(async (tx) => {
       const existing = await tx.purchase.findUniqueOrThrow({ where: { id } });
 
-      // Reverse inventory: decrement stock
-      await tx.rawMaterial.update({
-        where: { id: existing.materialId },
-        data: {
-          currentStock: { decrement: existing.quantity },
-        },
-      });
+      // Reverse inventory only if it was a raw material purchase
+      if (existing.materialId) {
+        await tx.rawMaterial.update({
+          where: { id: existing.materialId },
+          data: {
+            currentStock: { decrement: existing.quantity },
+          },
+        });
+      }
 
-      // Remove related inventory movements
       await tx.inventoryMovement.deleteMany({
         where: { referenceId: id },
       });
 
-      // Delete the purchase
       await tx.purchase.delete({ where: { id } });
 
       return existing;

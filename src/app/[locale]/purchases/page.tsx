@@ -21,8 +21,12 @@ import { useToast } from '@/components/ui/use-toast';
 interface Purchase {
   id: string;
   date: string;
-  supplierName: string;
-  materialName: string;
+  category: string;
+  description: string | null;
+  supplierId: string | null;
+  materialId: string | null;
+  supplier: { name: string } | null;
+  material: { name: string } | null;
   quantity: number;
   unitPrice: number;
   totalCost: number;
@@ -88,18 +92,34 @@ export default function PurchasesPage() {
       cell: ({ row }) => new Date(row.getValue('date')).toLocaleDateString(),
     },
     {
-      accessorKey: 'supplierName',
-      header: t('supplier'),
+      accessorKey: 'category',
+      header: t('category'),
+      cell: ({ row }) => {
+        const cat = row.getValue('category') as string;
+        return t(`categories.${cat}`);
+      },
     },
     {
-      accessorKey: 'materialName',
-      header: t('material'),
+      id: 'item',
+      header: t('item'),
+      cell: ({ row }) => {
+        const purchase = row.original;
+        if (purchase.category === 'RAW_MATERIAL' && purchase.material) {
+          return purchase.material.name;
+        }
+        return purchase.description || '—';
+      },
+    },
+    {
+      id: 'supplierName',
+      header: t('supplier'),
+      cell: ({ row }) => row.original.supplier?.name || '—',
     },
     {
       accessorKey: 'quantity',
       header: t('quantity'),
       cell: ({ row }) =>
-        `${Number(row.getValue('quantity')).toLocaleString()} ${tCommon('kg')}`,
+        `${Number(row.getValue('quantity')).toLocaleString()}`,
     },
     {
       accessorKey: 'unitPrice',

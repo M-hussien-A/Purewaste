@@ -52,7 +52,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
         date: p.date,
         type: 'purchase',
         amount: new Decimal(p.totalCost.toString()),
-        reference: `Purchase - ${p.material.name} (${p.quantity}kg)`,
+        reference: `Purchase - ${p.material?.name || p.description || 'N/A'} (${p.quantity}kg)`,
         runningBalance: new Decimal(0),
       });
     }

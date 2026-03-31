@@ -54,6 +54,16 @@ enum BatchStatus {
   CANCELLED
 }
 
+enum PurchaseCategory {
+  RAW_MATERIAL
+  FUEL
+  FOOD
+  CONSUMABLES
+  MAINTENANCE
+  UTILITIES
+  OTHER
+}
+
 model User {
   id            String    @id @default(cuid())
   username      String    @unique
@@ -179,27 +189,30 @@ model Customer {
 }
 
 model Purchase {
-  id            String        @id @default(cuid())
+  id            String           @id @default(cuid())
   date          DateTime
-  supplierId    String
-  materialId    String
-  quantity      Decimal       @db.Decimal(12, 2)
-  unitPrice     Decimal       @db.Decimal(12, 4)
-  totalCost     Decimal       @db.Decimal(14, 2)
-  paymentStatus PaymentStatus @default(PENDING)
-  paidAmount    Decimal       @default(0) @db.Decimal(14, 2)
+  category      PurchaseCategory @default(RAW_MATERIAL)
+  description   String?
+  supplierId    String?
+  materialId    String?
+  quantity      Decimal          @db.Decimal(12, 2)
+  unitPrice     Decimal          @db.Decimal(12, 4)
+  totalCost     Decimal          @db.Decimal(14, 2)
+  paymentStatus PaymentStatus    @default(PENDING)
+  paidAmount    Decimal          @default(0) @db.Decimal(14, 2)
   notes         String?
   createdBy     String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
-  supplier  Supplier    @relation(fields: [supplierId], references: [id])
-  material  RawMaterial @relation(fields: [materialId], references: [id])
+  supplier  Supplier?   @relation(fields: [supplierId], references: [id])
+  material  RawMaterial? @relation(fields: [materialId], references: [id])
   creator   User        @relation("PurchaseCreator", fields: [createdBy], references: [id])
   payments  Payment[]   @relation("PurchasePayments")
 
   @@index([supplierId])
   @@index([date])
+  @@index([category])
 }
 
 model SmeltingBatch {

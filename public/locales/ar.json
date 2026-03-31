@@ -119,14 +119,31 @@
   "purchases": {
     "title": "المشتريات",
     "newPurchase": "شراء جديد",
+    "category": "التصنيف",
+    "item": "الصنف",
+    "description": "الوصف",
+    "descriptionPlaceholder": "مثال: سولار - زيت - أكل عمال",
+    "descriptionRequired": "الوصف مطلوب لهذا النوع من المشتريات",
+    "materialRequired": "المادة الخام مطلوبة",
+    "optional": "اختياري",
+    "noSupplier": "بدون مورد",
     "supplier": "المورد",
     "material": "المادة الخام",
-    "quantity": "الكمية (كجم)",
+    "quantity": "الكمية",
     "unitPrice": "سعر الوحدة",
     "totalCost": "التكلفة الكلية",
     "paymentStatus": "حالة الدفع",
     "editPurchase": "تعديل الشراء",
-    "purchaseDetails": "تفاصيل الشراء"
+    "purchaseDetails": "تفاصيل الشراء",
+    "categories": {
+      "RAW_MATERIAL": "مواد خام",
+      "FUEL": "وقود / سولار",
+      "FOOD": "أكل وشرب",
+      "CONSUMABLES": "مستهلكات",
+      "MAINTENANCE": "صيانة",
+      "UTILITIES": "مرافق",
+      "OTHER": "أخرى"
+    }
   },
   "sales": {
     "title": "المبيعات",

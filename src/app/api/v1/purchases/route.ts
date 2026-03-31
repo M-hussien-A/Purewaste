@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'createdAt';
     const order = searchParams.get('order') || 'desc';
     const search = searchParams.get('search') || '';
+    const category = searchParams.get('category') || '';
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
     const skip = (page - 1) * limit;
@@ -35,8 +36,12 @@ export async function GET(request: NextRequest) {
       where.OR = [
         { supplier: { name: { contains: search, mode: 'insensitive' } } },
         { material: { name: { contains: search, mode: 'insensitive' } } },
+        { description: { contains: search, mode: 'insensitive' } },
         { notes: { contains: search, mode: 'insensitive' } },
       ];
+    }
+    if (category) {
+      where.category = category;
     }
     if (dateFrom || dateTo) {
       where.date = {};
@@ -50,7 +55,11 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
         orderBy: { [sort]: order },
-        include: { supplier: true, material: true, creator: { select: { id: true, fullName: true } } },
+        include: {
+          supplier: true,
+          material: true,
+          creator: { select: { id: true, fullName: true } },
+        },
       }),
       prisma.purchase.count({ where }),
     ]);
@@ -80,16 +89,18 @@ export async function POST(request: NextRequest) {
       return errorResponse('VALIDATION_ERROR', 'Invalid input', validation.error.flatten(), 400);
     }
 
-    const { date, supplierId, materialId, quantity, unitPrice, notes } = validation.data;
+    const { date, category, description, supplierId, materialId, quantity, unitPrice, notes } = validation.data;
     const totalCost = new Decimal(quantity).mul(new Decimal(unitPrice));
+    const isRawMaterial = category === 'RAW_MATERIAL' && materialId;
 
     const result = await prisma.$transaction(async (tx) => {
-      // Create the purchase
       const purchase = await tx.purchase.create({
         data: {
           date: new Date(date),
-          supplierId,
-          materialId,
+          category,
+          description: description || null,
+          supplierId: supplierId || null,
+          materialId: isRawMaterial ? materialId : null,
           quantity: new Decimal(quantity),
           unitPrice: new Decimal(unitPrice),
           totalCost,
@@ -99,35 +110,35 @@ export async function POST(request: NextRequest) {
         include: { supplier: true, material: true },
       });
 
-      // Update raw material stock and weighted average cost
-      const material = await tx.rawMaterial.findUniqueOrThrow({ where: { id: materialId } });
-      const newAvgCost = calculateWeightedAverage(
-        material.currentStock.toString(),
-        material.avgCostPerKg.toString(),
-        quantity,
-        unitPrice
-      );
+      if (isRawMaterial) {
+        const material = await tx.rawMaterial.findUniqueOrThrow({ where: { id: materialId } });
+        const newAvgCost = calculateWeightedAverage(
+          material.currentStock.toString(),
+          material.avgCostPerKg.toString(),
+          quantity,
+          unitPrice
+        );
 
-      await tx.rawMaterial.update({
-        where: { id: materialId },
-        data: {
-          currentStock: { increment: new Decimal(quantity) },
-          avgCostPerKg: newAvgCost,
-        },
-      });
+        await tx.rawMaterial.update({
+          where: { id: materialId },
+          data: {
+            currentStock: { increment: new Decimal(quantity) },
+            avgCostPerKg: newAvgCost,
+          },
+        });
 
-      // Create inventory movement
-      await tx.inventoryMovement.create({
-        data: {
-          date: new Date(date),
-          type: 'IN',
-          rawMaterialId: materialId,
-          quantity: new Decimal(quantity),
-          reason: 'PURCHASE',
-          referenceId: purchase.id,
-          userId,
-        },
-      });
+        await tx.inventoryMovement.create({
+          data: {
+            date: new Date(date),
+            type: 'IN',
+            rawMaterialId: materialId,
+            quantity: new Decimal(quantity),
+            reason: 'PURCHASE',
+            referenceId: purchase.id,
+            userId,
+          },
+        });
+      }
 
       return purchase;
     });

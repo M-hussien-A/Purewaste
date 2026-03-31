@@ -17,10 +17,22 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 
+const PURCHASE_CATEGORIES = [
+  'RAW_MATERIAL',
+  'FUEL',
+  'FOOD',
+  'CONSUMABLES',
+  'MAINTENANCE',
+  'UTILITIES',
+  'OTHER',
+] as const;
+
 const purchaseSchema = z.object({
   date: z.string().min(1),
-  supplierId: z.string().min(1),
-  materialId: z.string().min(1),
+  category: z.enum(PURCHASE_CATEGORIES),
+  description: z.string().optional(),
+  supplierId: z.string().optional(),
+  materialId: z.string().optional(),
   quantity: z.number().positive(),
   unitPrice: z.number().positive(),
   notes: z.string().optional(),
@@ -62,6 +74,8 @@ export function PurchaseForm({ initialData, onSuccess, onCancel }: PurchaseFormP
     resolver: zodResolver(purchaseSchema),
     defaultValues: {
       date: (initialData?.date as string)?.split('T')[0] || new Date().toISOString().split('T')[0],
+      category: (initialData?.category as typeof PURCHASE_CATEGORIES[number]) || 'RAW_MATERIAL',
+      description: (initialData?.description as string) || '',
       supplierId: (initialData?.supplierId as string) || '',
       materialId: (initialData?.materialId as string) || '',
       quantity: (initialData?.quantity as number) || 0,
@@ -69,6 +83,9 @@ export function PurchaseForm({ initialData, onSuccess, onCancel }: PurchaseFormP
       notes: (initialData?.notes as string) || '',
     },
   });
+
+  const watchedCategory = watch('category');
+  const isRawMaterial = watchedCategory === 'RAW_MATERIAL';
 
   useEffect(() => {
     Promise.all([
@@ -88,16 +105,33 @@ export function PurchaseForm({ initialData, onSuccess, onCancel }: PurchaseFormP
   );
 
   const onSubmit = async (data: PurchaseFormValues) => {
+    if (isRawMaterial && (!data.materialId || data.materialId === '')) {
+      toast({ title: t('materialRequired'), variant: 'destructive' });
+      return;
+    }
+    if (!isRawMaterial && (!data.description || data.description.trim() === '')) {
+      toast({ title: t('descriptionRequired'), variant: 'destructive' });
+      return;
+    }
     try {
       setSubmitting(true);
       const url = initialData
         ? `/api/v1/purchases/${(initialData as Record<string, unknown>).id}`
         : '/api/v1/purchases';
       const method = initialData ? 'PUT' : 'POST';
+
+      const payload: any = { ...data };
+      if (!isRawMaterial) {
+        delete payload.materialId;
+      }
+      if (!payload.supplierId) {
+        delete payload.supplierId;
+      }
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         onSuccess();
@@ -114,24 +148,58 @@ export function PurchaseForm({ initialData, onSuccess, onCancel }: PurchaseFormP
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <Label>{tCommon('date')}</Label>
-        <Input type="date" {...register('date')} />
-        {errors.date && (
-          <p className="text-sm text-destructive">{tCommon('required')}</p>
-        )}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>{tCommon('date')}</Label>
+          <Input type="date" {...register('date')} />
+          {errors.date && (
+            <p className="text-sm text-destructive">{tCommon('required')}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label>{t('category')}</Label>
+          <Select
+            value={watchedCategory}
+            onValueChange={(val) => setValue('category', val as typeof PURCHASE_CATEGORIES[number])}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={t('category')} />
+            </SelectTrigger>
+            <SelectContent>
+              {PURCHASE_CATEGORIES.map((cat) => (
+                <SelectItem key={cat} value={cat}>
+                  {t(`categories.${cat}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
+      {!isRawMaterial && (
+        <div className="space-y-2">
+          <Label>{t('description')}</Label>
+          <Input {...register('description')} placeholder={t('descriptionPlaceholder')} />
+          {errors.description && (
+            <p className="text-sm text-destructive">{tCommon('required')}</p>
+          )}
+        </div>
+      )}
+
       <div className="space-y-2">
-        <Label>{t('supplier')}</Label>
+        <Label>{t('supplier')} {!isRawMaterial && <span className="text-muted-foreground text-xs">({t('optional')})</span>}</Label>
         <Select
-          value={watch('supplierId')}
-          onValueChange={(val) => setValue('supplierId', val)}
+          value={watch('supplierId') || ''}
+          onValueChange={(val) => setValue('supplierId', val === '__none__' ? '' : val)}
         >
           <SelectTrigger>
             <SelectValue placeholder={t('supplier')} />
           </SelectTrigger>
           <SelectContent>
+            {!isRawMaterial && (
+              <SelectItem value="__none__">— {t('noSupplier')} —</SelectItem>
+            )}
             {suppliers.map((s) => (
               <SelectItem key={s.id} value={s.id}>
                 {s.name}
@@ -144,27 +212,29 @@ export function PurchaseForm({ initialData, onSuccess, onCancel }: PurchaseFormP
         )}
       </div>
 
-      <div className="space-y-2">
-        <Label>{t('material')}</Label>
-        <Select
-          value={watch('materialId')}
-          onValueChange={(val) => setValue('materialId', val)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={t('material')} />
-          </SelectTrigger>
-          <SelectContent>
-            {materials.map((m) => (
-              <SelectItem key={m.id} value={m.id}>
-                {m.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {errors.materialId && (
-          <p className="text-sm text-destructive">{tCommon('required')}</p>
-        )}
-      </div>
+      {isRawMaterial && (
+        <div className="space-y-2">
+          <Label>{t('material')}</Label>
+          <Select
+            value={watch('materialId') || ''}
+            onValueChange={(val) => setValue('materialId', val)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={t('material')} />
+            </SelectTrigger>
+            <SelectContent>
+              {materials.map((m) => (
+                <SelectItem key={m.id} value={m.id}>
+                  {m.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.materialId && (
+            <p className="text-sm text-destructive">{tCommon('required')}</p>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">

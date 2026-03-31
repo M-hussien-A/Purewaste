@@ -74,6 +74,7 @@ export async function GET(request: NextRequest) {
 
     const now = new Date();
     for (const purchase of unpaidPurchases) {
+      if (!purchase.supplier) continue;
       const dueDate = new Date(purchase.date);
       dueDate.setDate(dueDate.getDate() + purchase.supplier.paymentTerms);
       if (now > dueDate) {

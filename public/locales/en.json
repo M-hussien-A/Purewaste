@@ -119,14 +119,31 @@
   "purchases": {
     "title": "Purchases",
     "newPurchase": "New Purchase",
+    "category": "Category",
+    "item": "Item",
+    "description": "Description",
+    "descriptionPlaceholder": "e.g. Diesel - Oil - Worker meals",
+    "descriptionRequired": "Description is required for this purchase type",
+    "materialRequired": "Raw material is required",
+    "optional": "optional",
+    "noSupplier": "No Supplier",
     "supplier": "Supplier",
     "material": "Raw Material",
-    "quantity": "Quantity (kg)",
+    "quantity": "Quantity",
     "unitPrice": "Unit Price",
     "totalCost": "Total Cost",
     "paymentStatus": "Payment Status",
     "editPurchase": "Edit Purchase",
-    "purchaseDetails": "Purchase Details"
+    "purchaseDetails": "Purchase Details",
+    "categories": {
+      "RAW_MATERIAL": "Raw Material",
+      "FUEL": "Fuel / Diesel",
+      "FOOD": "Food & Drinks",
+      "CONSUMABLES": "Consumables",
+      "MAINTENANCE": "Maintenance",
+      "UTILITIES": "Utilities",
+      "OTHER": "Other"
+    }
   },
   "sales": {
     "title": "Sales",
