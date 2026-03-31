@@ -6,10 +6,13 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    // Check if already seeded
+    // Check if already seeded - block re-seeding
     const existingUsers = await prisma.user.count();
     if (existingUsers > 0) {
-      return NextResponse.json({ message: 'Database already seeded', users: existingUsers });
+      return NextResponse.json(
+        { success: false, message: 'Database already seeded. Seed endpoint is now locked.' },
+        { status: 403 }
+      );
     }
 
     // 1. Create Users

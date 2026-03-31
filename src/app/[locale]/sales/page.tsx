@@ -46,12 +46,36 @@ export default function SalesPage() {
       header: tCommon('date'),
       cell: ({ row }) => new Date(row.original.date).toLocaleDateString(),
     },
-    { accessorKey: 'customer.nameAr', header: t('customer') },
-    { accessorKey: 'product.nameAr', header: t('product') },
-    { accessorKey: 'quantity', header: t('quantity') },
-    { accessorKey: 'pricePerKg', header: t('pricePerKg') },
-    { accessorKey: 'totalRevenue', header: t('totalRevenue') },
-    { accessorKey: 'grossProfit', header: t('grossProfit') },
+    {
+      id: 'customer',
+      header: t('customer'),
+      cell: ({ row }) => row.original.customer?.name || '—',
+    },
+    {
+      id: 'product',
+      header: t('product'),
+      cell: ({ row }) => row.original.product?.name || '—',
+    },
+    {
+      accessorKey: 'quantity',
+      header: t('quantity'),
+      cell: ({ row }) => `${Number(row.original.quantity).toLocaleString()} ${tCommon('kg')}`,
+    },
+    {
+      accessorKey: 'pricePerKg',
+      header: t('pricePerKg'),
+      cell: ({ row }) => `${Number(row.original.pricePerKg).toFixed(2)} ${tCommon('currency')}`,
+    },
+    {
+      accessorKey: 'totalRevenue',
+      header: t('totalRevenue'),
+      cell: ({ row }) => `${Number(row.original.totalRevenue).toLocaleString()} ${tCommon('currency')}`,
+    },
+    {
+      accessorKey: 'grossProfit',
+      header: t('grossProfit'),
+      cell: ({ row }) => `${Number(row.original.grossProfit).toLocaleString()} ${tCommon('currency')}`,
+    },
     {
       accessorKey: 'paymentStatus',
       header: tCommon('status'),

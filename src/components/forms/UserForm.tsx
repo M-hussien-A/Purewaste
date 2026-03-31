@@ -55,17 +55,17 @@ export function UserForm({ onSuccess }: { onSuccess?: () => void }) {
         <div className="space-y-2">
           <Label>{t('username')}</Label>
           <Input {...register('username')} />
-          {errors.username && <p className="text-sm text-danger">{errors.username.message}</p>}
+          {errors.username && <p className="text-sm text-destructive">{errors.username.message}</p>}
         </div>
         <div className="space-y-2">
           <Label>{t('email')}</Label>
           <Input type="email" {...register('email')} />
-          {errors.email && <p className="text-sm text-danger">{errors.email.message}</p>}
+          {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
         </div>
         <div className="space-y-2">
           <Label>{t('fullName')}</Label>
           <Input {...register('fullName')} />
-          {errors.fullName && <p className="text-sm text-danger">{errors.fullName.message}</p>}
+          {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
         </div>
         <div className="space-y-2">
           <Label>{tCommon('phone')}</Label>
@@ -74,7 +74,7 @@ export function UserForm({ onSuccess }: { onSuccess?: () => void }) {
         <div className="space-y-2">
           <Label>{tCommon('password') || 'Password'}</Label>
           <Input type="password" {...register('password')} />
-          {errors.password && <p className="text-sm text-danger">{errors.password.message}</p>}
+          {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
         </div>
         <div className="space-y-2">
           <Label>{t('role')}</Label>

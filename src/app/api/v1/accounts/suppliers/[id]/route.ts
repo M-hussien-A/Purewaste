@@ -105,3 +105,41 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     return errorResponse('INTERNAL_ERROR', 'Failed to update supplier', null, 500);
   }
 }
+
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  try {
+    const session = await auth();
+    if (!session?.user) {
+      return errorResponse('UNAUTHORIZED', 'Not authenticated', null, 401);
+    }
+    const userId = (session.user as any).id;
+    const userRole = (session.user as any).role;
+    if (!checkPermission(userRole, 'accounts_suppliers', 'delete')) {
+      return errorResponse('FORBIDDEN', 'Insufficient permissions', null, 403);
+    }
+
+    const { id } = await context.params;
+    const existing = await prisma.supplier.findUnique({ where: { id } });
+    if (!existing) {
+      return errorResponse('NOT_FOUND', 'Supplier not found', null, 404);
+    }
+
+    // Check for linked purchases
+    const purchasesCount = await prisma.purchase.count({ where: { supplierId: id } });
+    if (purchasesCount > 0) {
+      // Deactivate instead of delete if has purchases
+      await prisma.supplier.update({ where: { id }, data: { isActive: false } });
+      await logAction({ userId, action: 'UPDATE', module: 'accounts_suppliers', recordId: id, oldValue: existing as any, newValue: { ...existing, isActive: false } as any });
+      return successResponse({ message: 'Supplier deactivated (has linked purchases)' });
+    }
+
+    await prisma.supplier.delete({ where: { id } });
+
+    await logAction({ userId, action: 'DELETE', module: 'accounts_suppliers', recordId: id, oldValue: existing as any });
+
+    return successResponse({ message: 'Supplier deleted successfully' });
+  } catch (error) {
+    console.error('Delete supplier error:', error);
+    return errorResponse('INTERNAL_ERROR', 'Failed to delete supplier', null, 500);
+  }
+}

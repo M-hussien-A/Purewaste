@@ -123,3 +123,49 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     return errorResponse('INTERNAL_ERROR', 'Failed to update user', null, 500);
   }
 }
+
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  try {
+    const session = await auth();
+    if (!session?.user) {
+      return errorResponse('UNAUTHORIZED', 'Not authenticated', null, 401);
+    }
+    const currentUserId = (session.user as any).id;
+    const userRole = (session.user as any).role;
+    if (!checkPermission(userRole, 'users', 'delete')) {
+      return errorResponse('FORBIDDEN', 'Insufficient permissions', null, 403);
+    }
+
+    const { id } = await context.params;
+
+    if (id === currentUserId) {
+      return errorResponse('VALIDATION_ERROR', 'Cannot delete your own account', null, 400);
+    }
+
+    const existing = await prisma.user.findUnique({ where: { id }, select: USER_SELECT });
+    if (!existing) {
+      return errorResponse('NOT_FOUND', 'User not found', null, 404);
+    }
+
+    // Deactivate instead of hard delete to preserve audit trail
+    const updated = await prisma.user.update({
+      where: { id },
+      data: { isActive: false },
+      select: USER_SELECT,
+    });
+
+    await logAction({
+      userId: currentUserId,
+      action: 'DELETE',
+      module: 'users',
+      recordId: id,
+      oldValue: existing as any,
+      newValue: updated as any,
+    });
+
+    return successResponse({ message: 'User deactivated successfully' });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    return errorResponse('INTERNAL_ERROR', 'Failed to delete user', null, 500);
+  }
+}

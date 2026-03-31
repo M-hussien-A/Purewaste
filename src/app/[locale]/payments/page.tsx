@@ -56,19 +56,31 @@ export default function PaymentsPage() {
       header: tCommon('date'),
       cell: ({ row }) => new Date(row.original.date).toLocaleDateString(),
     },
-    { accessorKey: 'supplier.nameAr', header: t('supplier') },
+    {
+      id: 'supplier',
+      header: t('payable'),
+      cell: ({ row }) => row.original.supplier?.name || '—',
+    },
     {
       accessorKey: 'amount',
       header: t('amount'),
       cell: ({ row }) =>
         `${Number(row.original.amount).toLocaleString()} ${tCommon('currency')}`,
     },
-    { accessorKey: 'method', header: t('method') },
-    { accessorKey: 'reference', header: t('reference') },
     {
-      accessorKey: 'status',
-      header: tCommon('status'),
-      cell: ({ row }) => <StatusBadge status={row.original.status} />,
+      accessorKey: 'method',
+      header: t('method'),
+      cell: ({ row }) => {
+        const m = row.original.method;
+        if (m === 'CASH') return t('cash');
+        if (m === 'BANK_TRANSFER') return t('bankTransfer');
+        if (m === 'CHECK') return t('check');
+        return m;
+      },
+    },
+    {
+      accessorKey: 'notes',
+      header: tCommon('notes'),
     },
   ];
 
@@ -78,19 +90,31 @@ export default function PaymentsPage() {
       header: tCommon('date'),
       cell: ({ row }) => new Date(row.original.date).toLocaleDateString(),
     },
-    { accessorKey: 'customer.nameAr', header: t('customer') },
+    {
+      id: 'customer',
+      header: t('receivable'),
+      cell: ({ row }) => row.original.customer?.name || '—',
+    },
     {
       accessorKey: 'amount',
       header: t('amount'),
       cell: ({ row }) =>
         `${Number(row.original.amount).toLocaleString()} ${tCommon('currency')}`,
     },
-    { accessorKey: 'method', header: t('method') },
-    { accessorKey: 'reference', header: t('reference') },
     {
-      accessorKey: 'status',
-      header: tCommon('status'),
-      cell: ({ row }) => <StatusBadge status={row.original.status} />,
+      accessorKey: 'method',
+      header: t('method'),
+      cell: ({ row }) => {
+        const m = row.original.method;
+        if (m === 'CASH') return t('cash');
+        if (m === 'BANK_TRANSFER') return t('bankTransfer');
+        if (m === 'CHECK') return t('check');
+        return m;
+      },
+    },
+    {
+      accessorKey: 'notes',
+      header: tCommon('notes'),
     },
   ];
 

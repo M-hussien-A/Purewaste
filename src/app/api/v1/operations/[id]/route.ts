@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import { checkPermission } from '@/lib/rbac';
 import { logAction } from '@/lib/audit';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import Decimal from 'decimal.js';
 export const dynamic = 'force-dynamic';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -89,5 +90,71 @@ export async function PUT(request: NextRequest, context: RouteContext) {
   } catch (error) {
     console.error('Update operation error:', error);
     return errorResponse('INTERNAL_ERROR', 'Failed to update operation', null, 500);
+  }
+}
+
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  try {
+    const session = await auth();
+    if (!session?.user) {
+      return errorResponse('UNAUTHORIZED', 'Not authenticated', null, 401);
+    }
+    const userId = (session.user as any).id;
+    const userRole = (session.user as any).role;
+    if (!checkPermission(userRole, 'operations', 'delete')) {
+      return errorResponse('FORBIDDEN', 'Insufficient permissions', null, 403);
+    }
+
+    const { id } = await context.params;
+
+    const result = await prisma.$transaction(async (tx) => {
+      const existing = await tx.smeltingBatch.findUnique({
+        where: { id },
+        include: { inputs: true, outputs: true },
+      });
+      if (!existing) {
+        throw new Error('NOT_FOUND');
+      }
+
+      // Reverse input materials: add back to raw material stock
+      for (const input of existing.inputs) {
+        await tx.rawMaterial.update({
+          where: { id: input.materialId },
+          data: { currentStock: { increment: input.quantity } },
+        });
+      }
+
+      // Reverse output products: deduct from finished product stock
+      for (const output of existing.outputs) {
+        await tx.finishedProduct.update({
+          where: { id: output.productId },
+          data: { currentStock: { decrement: output.quantity } },
+        });
+      }
+
+      // Remove related inventory movements
+      await tx.inventoryMovement.deleteMany({ where: { referenceId: id } });
+
+      // Cascade deletes inputs/outputs, then delete batch
+      await tx.smeltingBatch.delete({ where: { id } });
+
+      return existing;
+    });
+
+    await logAction({
+      userId,
+      action: 'DELETE',
+      module: 'operations',
+      recordId: id,
+      oldValue: result as any,
+    });
+
+    return successResponse({ message: 'Operation deleted successfully' });
+  } catch (error: any) {
+    if (error.message === 'NOT_FOUND') {
+      return errorResponse('NOT_FOUND', 'Smelting batch not found', null, 404);
+    }
+    console.error('Delete operation error:', error);
+    return errorResponse('INTERNAL_ERROR', 'Failed to delete operation', null, 500);
   }
 }

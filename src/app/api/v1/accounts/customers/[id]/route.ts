@@ -105,3 +105,41 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     return errorResponse('INTERNAL_ERROR', 'Failed to update customer', null, 500);
   }
 }
+
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  try {
+    const session = await auth();
+    if (!session?.user) {
+      return errorResponse('UNAUTHORIZED', 'Not authenticated', null, 401);
+    }
+    const userId = (session.user as any).id;
+    const userRole = (session.user as any).role;
+    if (!checkPermission(userRole, 'accounts_customers', 'delete')) {
+      return errorResponse('FORBIDDEN', 'Insufficient permissions', null, 403);
+    }
+
+    const { id } = await context.params;
+    const existing = await prisma.customer.findUnique({ where: { id } });
+    if (!existing) {
+      return errorResponse('NOT_FOUND', 'Customer not found', null, 404);
+    }
+
+    // Check for linked sales
+    const salesCount = await prisma.sale.count({ where: { customerId: id } });
+    if (salesCount > 0) {
+      // Deactivate instead of delete if has sales
+      await prisma.customer.update({ where: { id }, data: { isActive: false } });
+      await logAction({ userId, action: 'UPDATE', module: 'accounts_customers', recordId: id, oldValue: existing as any, newValue: { ...existing, isActive: false } as any });
+      return successResponse({ message: 'Customer deactivated (has linked sales)' });
+    }
+
+    await prisma.customer.delete({ where: { id } });
+
+    await logAction({ userId, action: 'DELETE', module: 'accounts_customers', recordId: id, oldValue: existing as any });
+
+    return successResponse({ message: 'Customer deleted successfully' });
+  } catch (error) {
+    console.error('Delete customer error:', error);
+    return errorResponse('INTERNAL_ERROR', 'Failed to delete customer', null, 500);
+  }
+}
