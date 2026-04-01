@@ -6,6 +6,21 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import Decimal from 'decimal.js';
 export const dynamic = 'force-dynamic';
 
+function getWeekBounds(now: Date): { start: Date; end: Date } {
+  // Monday-Sunday week
+  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysFromMonday);
+  const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6, 23, 59, 59, 999);
+  return { start: monday, end: sunday };
+}
+
+function getPrevWeekBounds(currentStart: Date): { start: Date; end: Date } {
+  const prevMonday = new Date(currentStart.getFullYear(), currentStart.getMonth(), currentStart.getDate() - 7);
+  const prevSunday = new Date(prevMonday.getFullYear(), prevMonday.getMonth(), prevMonday.getDate() + 6, 23, 59, 59, 999);
+  return { start: prevMonday, end: prevSunday };
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
@@ -17,20 +32,38 @@ export async function GET(request: NextRequest) {
       return errorResponse('FORBIDDEN', 'Insufficient permissions', null, 403);
     }
 
+    const { searchParams } = new URL(request.url);
+    const period = searchParams.get('period') === 'week' ? 'week' : 'month';
+
     const now = new Date();
-    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-    const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
+    let periodStart: Date;
+    let periodEnd: Date;
+    let prevPeriodStart: Date;
+    let prevPeriodEnd: Date;
+
+    if (period === 'week') {
+      const current = getWeekBounds(now);
+      const previous = getPrevWeekBounds(current.start);
+      periodStart = current.start;
+      periodEnd = current.end;
+      prevPeriodStart = previous.start;
+      prevPeriodEnd = previous.end;
+    } else {
+      periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      prevPeriodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      prevPeriodEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+    }
 
     // Fetch all data in parallel
     const [
       rawMaterials,
       finishedProducts,
-      currentMonthSales,
-      prevMonthSales,
-      currentMonthBatches,
-      prevMonthBatches,
+      currentPeriodSales,
+      prevPeriodSales,
+      currentPeriodBatches,
+      prevPeriodBatches,
       recentSales,
       recentBatches,
     ] = await Promise.all([
@@ -41,24 +74,24 @@ export async function GET(request: NextRequest) {
         _sum: { currentStock: true },
       }),
       prisma.sale.findMany({
-        where: { date: { gte: currentMonthStart, lte: currentMonthEnd } },
+        where: { date: { gte: periodStart, lte: periodEnd } },
       }),
       prisma.sale.findMany({
-        where: { date: { gte: prevMonthStart, lte: prevMonthEnd } },
+        where: { date: { gte: prevPeriodStart, lte: prevPeriodEnd } },
       }),
       prisma.smeltingBatch.findMany({
-        where: { date: { gte: currentMonthStart, lte: currentMonthEnd } },
+        where: { date: { gte: periodStart, lte: periodEnd } },
       }),
       prisma.smeltingBatch.findMany({
-        where: { date: { gte: prevMonthStart, lte: prevMonthEnd } },
+        where: { date: { gte: prevPeriodStart, lte: prevPeriodEnd } },
       }),
       prisma.sale.findMany({
-        where: { date: { gte: currentMonthStart, lte: currentMonthEnd } },
+        where: { date: { gte: periodStart, lte: periodEnd } },
         orderBy: { date: 'asc' },
         select: { date: true, totalRevenue: true, grossProfit: true },
       }),
       prisma.smeltingBatch.findMany({
-        where: { date: { gte: currentMonthStart, lte: currentMonthEnd } },
+        where: { date: { gte: periodStart, lte: periodEnd } },
         orderBy: { date: 'asc' },
         select: { date: true, lossRatio: true, totalCost: true, batchNumber: true },
       }),
@@ -69,33 +102,33 @@ export async function GET(request: NextRequest) {
     const totalFinishedStock = new Decimal(finishedProducts._sum.currentStock?.toString() || '0');
     const totalInventory = totalRawStock.plus(totalFinishedStock);
 
-    const currentRevenue = currentMonthSales.reduce(
+    const currentRevenue = currentPeriodSales.reduce(
       (sum, s) => sum.plus(new Decimal(s.totalRevenue.toString())),
       new Decimal(0)
     );
-    const prevRevenue = prevMonthSales.reduce(
+    const prevRevenue = prevPeriodSales.reduce(
       (sum, s) => sum.plus(new Decimal(s.totalRevenue.toString())),
       new Decimal(0)
     );
 
-    const currentProfit = currentMonthSales.reduce(
+    const currentProfit = currentPeriodSales.reduce(
       (sum, s) => sum.plus(new Decimal(s.grossProfit.toString())),
       new Decimal(0)
     );
-    const prevProfit = prevMonthSales.reduce(
+    const prevProfit = prevPeriodSales.reduce(
       (sum, s) => sum.plus(new Decimal(s.grossProfit.toString())),
       new Decimal(0)
     );
 
-    const currentAvgLoss = currentMonthBatches.length > 0
-      ? currentMonthBatches
+    const currentAvgLoss = currentPeriodBatches.length > 0
+      ? currentPeriodBatches
           .reduce((sum, b) => sum.plus(new Decimal(b.lossRatio.toString())), new Decimal(0))
-          .div(currentMonthBatches.length)
+          .div(currentPeriodBatches.length)
       : new Decimal(0);
-    const prevAvgLoss = prevMonthBatches.length > 0
-      ? prevMonthBatches
+    const prevAvgLoss = prevPeriodBatches.length > 0
+      ? prevPeriodBatches
           .reduce((sum, b) => sum.plus(new Decimal(b.lossRatio.toString())), new Decimal(0))
-          .div(prevMonthBatches.length)
+          .div(prevPeriodBatches.length)
       : new Decimal(0);
 
     // Percentage change helper
@@ -119,9 +152,13 @@ export async function GET(request: NextRequest) {
     }));
 
     return successResponse({
+      period,
+      periodStart: periodStart.toISOString().split('T')[0],
+      periodEnd: periodEnd.toISOString().split('T')[0],
       kpis: {
         totalInventory: {
           value: totalInventory.toNumber(),
+          change: 0,
           rawStock: totalRawStock.toNumber(),
           finishedStock: totalFinishedStock.toNumber(),
         },

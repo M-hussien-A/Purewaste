@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
         // Deduct from stock
         await tx.rawMaterial.update({
           where: { id: input.materialId },
-          data: { currentStock: { decrement: inputQty } },
+          data: { currentStock: { decrement: inputQty.toNumber() } },
         });
 
         inputRecords.push({ materialId: input.materialId, quantity: inputQty, unitCost });
@@ -161,31 +161,31 @@ export async function POST(request: NextRequest) {
         data: {
           date: new Date(date),
           status: 'COMPLETED',
-          totalInputQty,
-          totalOutputQty,
-          lossRatio,
-          electricityHrs: new Decimal(electricityHrs),
-          laborHrs: new Decimal(laborHrs),
-          otherExpenses: new Decimal(otherExpenses),
-          materialCost,
-          operatingCost,
-          maintenanceAlloc,
-          totalCost,
-          costPerKg,
+          totalInputQty: totalInputQty.toNumber(),
+          totalOutputQty: totalOutputQty.toNumber(),
+          lossRatio: lossRatio.toNumber(),
+          electricityHrs,
+          laborHrs,
+          otherExpenses,
+          materialCost: materialCost.toNumber(),
+          operatingCost: operatingCost.toNumber(),
+          maintenanceAlloc: maintenanceAlloc.toNumber(),
+          totalCost: totalCost.toNumber(),
+          costPerKg: costPerKg.toNumber(),
           notes,
           createdBy: userId,
           inputs: {
             create: inputRecords.map((r) => ({
               materialId: r.materialId,
-              quantity: r.quantity,
-              unitCost: r.unitCost,
+              quantity: r.quantity.toNumber(),
+              unitCost: r.unitCost.toNumber(),
             })),
           },
           outputs: {
             create: outputs.map((o) => ({
               productId: o.productId,
-              quantity: new Decimal(o.quantity),
-              costPerKg,
+              quantity: o.quantity,
+              costPerKg: costPerKg.toNumber(),
             })),
           },
         },
@@ -202,7 +202,7 @@ export async function POST(request: NextRequest) {
             date: new Date(date),
             type: 'OUT',
             rawMaterialId: input.materialId,
-            quantity: input.quantity,
+            quantity: input.quantity.toNumber(),
             reason: 'SMELTING',
             referenceId: batch.id,
             userId,
@@ -213,7 +213,7 @@ export async function POST(request: NextRequest) {
       // Process outputs: update finished product stock and create movements
       for (const output of outputs) {
         const product = await tx.finishedProduct.findUniqueOrThrow({ where: { id: output.productId } });
-        const outputQty = new Decimal(output.quantity);
+        const outputQty = output.quantity;
 
         const newAvgCost = calculateWeightedAverage(
           product.currentStock.toString(),
@@ -226,7 +226,7 @@ export async function POST(request: NextRequest) {
           where: { id: output.productId },
           data: {
             currentStock: { increment: outputQty },
-            avgCostPerKg: newAvgCost,
+            avgCostPerKg: newAvgCost.toNumber(),
           },
         });
 

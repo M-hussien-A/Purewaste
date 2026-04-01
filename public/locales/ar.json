@@ -92,7 +92,11 @@
     "totalRawMaterials": "إجمالي المواد الخام",
     "totalFinishedProducts": "إجمالي المنتجات الجاهزة",
     "batchesThisMonth": "صهرات هذا الشهر",
-    "pendingPayments": "مدفوعات معلقة"
+    "pendingPayments": "مدفوعات معلقة",
+    "weekly": "أسبوعي",
+    "monthly": "شهري",
+    "thisWeek": "هذا الأسبوع",
+    "thisMonth": "هذا الشهر"
   },
   "operations": {
     "title": "عمليات الصهر",

@@ -92,7 +92,11 @@
     "totalRawMaterials": "Total Raw Materials",
     "totalFinishedProducts": "Total Finished Products",
     "batchesThisMonth": "Batches This Month",
-    "pendingPayments": "Pending Payments"
+    "pendingPayments": "Pending Payments",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month"
   },
   "operations": {
     "title": "Smelting Operations",
