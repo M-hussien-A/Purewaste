@@ -77,7 +77,8 @@
     "reports": "التقارير",
     "settings": "الإعدادات",
     "users": "إدارة المستخدمين",
-    "auditLog": "سجل المراجعة"
+    "auditLog": "سجل المراجعة",
+    "labor": "العمالة"
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -320,6 +321,26 @@
       "EXPORT": "تصدير",
       "PASSWORD_CHANGE": "تغيير كلمة المرور"
     }
+  },
+  "labor": {
+    "title": "العمالة",
+    "workerName": "اسم العامل",
+    "workerNameEn": "اسم العامل (إنجليزي)",
+    "costPerKg": "التكلفة لكل كيلو",
+    "newWorker": "عامل جديد",
+    "editWorker": "تعديل العامل",
+    "deleteWorker": "حذف العامل",
+    "deleteWorkerConfirm": "هل أنت متأكد من حذف هذا العامل؟",
+    "advance": "سلفة",
+    "settlement": "تصفية",
+    "newAdvance": "سلفة جديدة",
+    "newSettlement": "تصفية جديدة",
+    "totalAdvances": "إجمالي السلف",
+    "totalSettlements": "إجمالي التصفيات",
+    "balance": "الرصيد المتبقي",
+    "amount": "المبلغ",
+    "transactionType": "نوع العملية",
+    "history": "سجل الحركات"
   },
   "theme": {
     "light": "وضع فاتح",

@@ -77,7 +77,8 @@
     "reports": "Reports",
     "settings": "Settings",
     "users": "User Management",
-    "auditLog": "Audit Log"
+    "auditLog": "Audit Log",
+    "labor": "Labor"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -320,6 +321,26 @@
       "EXPORT": "Export",
       "PASSWORD_CHANGE": "Password Change"
     }
+  },
+  "labor": {
+    "title": "Labor",
+    "workerName": "Worker Name",
+    "workerNameEn": "Worker Name (English)",
+    "costPerKg": "Cost Per Kg",
+    "newWorker": "New Worker",
+    "editWorker": "Edit Worker",
+    "deleteWorker": "Delete Worker",
+    "deleteWorkerConfirm": "Are you sure you want to delete this worker?",
+    "advance": "Advance",
+    "settlement": "Settlement",
+    "newAdvance": "New Advance",
+    "newSettlement": "New Settlement",
+    "totalAdvances": "Total Advances",
+    "totalSettlements": "Total Settlements",
+    "balance": "Remaining Balance",
+    "amount": "Amount",
+    "transactionType": "Transaction Type",
+    "history": "Transaction History"
   },
   "theme": {
     "light": "Light Mode",

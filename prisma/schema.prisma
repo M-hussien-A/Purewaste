@@ -340,6 +340,41 @@ model InventoryMovement {
   @@index([date])
 }
 
+enum LaborTransactionType {
+  ADVANCE
+  SETTLEMENT
+}
+
+model Worker {
+  id           String  @id @default(cuid())
+  name         String
+  nameAr       String
+  phone        String?
+  costPerKg    Decimal @default(0) @db.Decimal(12, 4)
+  isActive     Boolean @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  transactions LaborTransaction[]
+}
+
+model LaborTransaction {
+  id        String               @id @default(cuid())
+  workerId  String
+  date      DateTime
+  type      LaborTransactionType
+  amount    Decimal              @db.Decimal(14, 2)
+  notes     String?
+  createdBy String
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  worker Worker @relation(fields: [workerId], references: [id])
+
+  @@index([workerId])
+  @@index([date])
+}
+
 model SystemSettings {
   id                String  @id @default("system")
   electricityRate   Decimal @default(5) @db.Decimal(10, 2)
