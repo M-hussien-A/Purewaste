@@ -28,7 +28,7 @@ export default function ReportsPage() {
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/v1/reports/profit?startDate=${startDate}&endDate=${endDate}`
+        `/api/v1/reports/profit?dateFrom=${startDate}&dateTo=${endDate}`
       );
       if (res.ok) {
         const json = await res.json();
@@ -82,7 +82,7 @@ export default function ReportsPage() {
 
       <div className="mb-6 flex flex-wrap items-end gap-4">
         <div className="space-y-2">
-          <Label>{t('startDate')}</Label>
+          <Label>{t('from')}</Label>
           <Input
             type="date"
             value={startDate}
@@ -90,7 +90,7 @@ export default function ReportsPage() {
           />
         </div>
         <div className="space-y-2">
-          <Label>{t('endDate')}</Label>
+          <Label>{t('to')}</Label>
           <Input
             type="date"
             value={endDate}
@@ -102,7 +102,7 @@ export default function ReportsPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -112,7 +112,7 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Number(report?.totalRevenue || 0).toLocaleString()} {tCommon('currency')}
+              {Number(report?.summary?.totalRevenue || 0).toLocaleString()} {tCommon('currency')}
             </div>
           </CardContent>
         </Card>
@@ -126,7 +126,7 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Number(report?.totalCosts || 0).toLocaleString()} {tCommon('currency')}
+              {Number(report?.summary?.totalCosts || 0).toLocaleString()} {tCommon('currency')}
             </div>
           </CardContent>
         </Card>
@@ -141,28 +141,50 @@ export default function ReportsPage() {
           <CardContent>
             <div
               className={`text-2xl font-bold ${
-                (report?.netProfit || 0) >= 0 ? 'text-green-600' : 'text-destructive'
+                Number(report?.summary?.grossProfit || 0) >= 0 ? 'text-green-600' : 'text-destructive'
               }`}
             >
-              {Number(report?.netProfit || 0).toLocaleString()} {tCommon('currency')}
+              {Number(report?.summary?.grossProfit || 0).toLocaleString()} {tCommon('currency')}
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t('profitMargin')}
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {Number(report?.summary?.profitMargin || 0).toFixed(1)}%
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {report?.summary?.salesCount || 0} {t('salesCount')}
+            </p>
           </CardContent>
         </Card>
       </div>
 
-      {report?.breakdown && (
+      {report?.batchBreakdown && report.batchBreakdown.length > 0 && (
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>{t('breakdown')}</CardTitle>
+            <CardTitle>{t('batchBreakdown')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {report.breakdown.map((item: any, index: number) => (
+              {report.batchBreakdown.map((item: any, index: number) => (
                 <div key={index} className="flex items-center justify-between border-b pb-2">
-                  <span className="text-sm text-muted-foreground">{item.label}</span>
-                  <span className="font-medium">
-                    {Number(item.value || 0).toLocaleString()} {tCommon('currency')}
+                  <span className="text-sm text-muted-foreground">
+                    {item.batchNumber ? `${t('batch')} #${item.batchNumber}` : t('noBatch')} ({item.salesCount} {t('salesCount')})
                   </span>
+                  <div className="flex gap-4 text-sm">
+                    <span>{t('totalRevenue')}: {Number(item.totalRevenue || 0).toLocaleString()} {tCommon('currency')}</span>
+                    <span className={Number(item.grossProfit || 0) >= 0 ? 'text-green-600' : 'text-destructive'}>
+                      {t('netProfit')}: {Number(item.grossProfit || 0).toLocaleString()} {tCommon('currency')}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>

@@ -97,7 +97,9 @@
     "weekly": "أسبوعي",
     "monthly": "شهري",
     "thisWeek": "هذا الأسبوع",
-    "thisMonth": "هذا الشهر"
+    "thisMonth": "هذا الشهر",
+    "weeklyRevenue": "إيرادات الأسبوع",
+    "weeklyProfit": "أرباح الأسبوع"
   },
   "operations": {
     "title": "عمليات الصهر",
@@ -253,7 +255,14 @@
     "totalRevenue": "إجمالي الإيرادات",
     "totalCosts": "إجمالي التكاليف",
     "netProfit": "صافي الربح",
-    "profitMargin": "هامش الربح"
+    "profitMargin": "هامش الربح",
+    "startDate": "من تاريخ",
+    "endDate": "إلى تاريخ",
+    "applyFilter": "تطبيق",
+    "batchBreakdown": "تفصيل حسب الصهرة",
+    "batch": "صهرة",
+    "noBatch": "بدون صهرة",
+    "salesCount": "عملية بيع"
   },
   "alerts": {
     "lowStock": "مخزون منخفض: {name} ({current} كجم، الحد الأدنى: {min} كجم)",

@@ -97,7 +97,9 @@
     "weekly": "Weekly",
     "monthly": "Monthly",
     "thisWeek": "This Week",
-    "thisMonth": "This Month"
+    "thisMonth": "This Month",
+    "weeklyRevenue": "Weekly Revenue",
+    "weeklyProfit": "Weekly Profit"
   },
   "operations": {
     "title": "Smelting Operations",
@@ -253,7 +255,14 @@
     "totalRevenue": "Total Revenue",
     "totalCosts": "Total Costs",
     "netProfit": "Net Profit",
-    "profitMargin": "Profit Margin"
+    "profitMargin": "Profit Margin",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "applyFilter": "Apply",
+    "batchBreakdown": "Breakdown by Batch",
+    "batch": "Batch",
+    "noBatch": "No Batch",
+    "salesCount": "sales"
   },
   "alerts": {
     "lowStock": "Low stock: {name} ({current} kg, minimum: {min} kg)",

@@ -124,14 +124,14 @@ export default function DashboardPage() {
           icon={Package}
         />
         <KPICard
-          title={t('monthlyRevenue')}
+          title={period === 'week' ? t('weeklyRevenue') : t('monthlyRevenue')}
           value={kpis.monthlyRevenue.value.toLocaleString()}
           unit={tCommon('currency')}
           change={kpis.monthlyRevenue.change}
           icon={TrendingUp}
         />
         <KPICard
-          title={t('monthlyProfit')}
+          title={period === 'week' ? t('weeklyProfit') : t('monthlyProfit')}
           value={kpis.monthlyProfit.value.toLocaleString()}
           unit={tCommon('currency')}
           change={kpis.monthlyProfit.change}
