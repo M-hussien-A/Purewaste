@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       return errorResponse('VALIDATION_ERROR', 'Invalid input', validation.error.flatten(), 400);
     }
 
-    const { date, inputs, outputs, electricityHrs, laborHrs, otherExpenses, notes } = validation.data;
+    const { date, inputMaterials: inputs, outputProducts: outputs, electricityHrs, laborHrs, otherExpenses, notes } = validation.data;
 
     const result = await prisma.$transaction(async (tx) => {
       // Get system settings for rates

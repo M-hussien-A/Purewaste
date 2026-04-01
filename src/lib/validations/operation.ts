@@ -2,13 +2,13 @@ import { z } from 'zod';
 
 export const smeltingBatchSchema = z.object({
   date: z.coerce.date(),
-  inputs: z.array(
+  inputMaterials: z.array(
     z.object({
       materialId: z.string().min(1, 'Material is required'),
       quantity: z.coerce.number().positive('Quantity must be a positive number'),
     })
   ).min(1, 'At least one input material is required'),
-  outputs: z.array(
+  outputProducts: z.array(
     z.object({
       productId: z.string().min(1, 'Product is required'),
       quantity: z.coerce.number().positive('Quantity must be a positive number'),
