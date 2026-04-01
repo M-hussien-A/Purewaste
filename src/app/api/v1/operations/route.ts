@@ -256,10 +256,11 @@ export async function POST(request: NextRequest) {
 
     return successResponse(result);
   } catch (error: any) {
-    console.error('Create operation error:', error);
+    console.error('Create operation error:', error?.message || error);
+    console.error('Full error:', JSON.stringify(error, null, 2));
     if (error.message?.includes('Insufficient stock') || error.message?.includes('System settings not found')) {
       return errorResponse('BUSINESS_ERROR', error.message, null, 400);
     }
-    return errorResponse('INTERNAL_ERROR', 'Failed to create smelting batch', null, 500);
+    return errorResponse('INTERNAL_ERROR', error?.message || 'Failed to create smelting batch', null, 500);
   }
 }
