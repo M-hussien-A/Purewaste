@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { ColumnDef } from '@tanstack/react-table';
-import { Plus } from 'lucide-react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { DataTable } from '@/components/tables/DataTable';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
@@ -17,6 +19,9 @@ import {
 } from '@/components/ui/dialog';
 import { OperationForm } from '@/components/forms/OperationForm';
 import { useToast } from '@/components/ui/use-toast';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { exportToCsv } from '@/lib/export-csv';
 
 interface Batch {
   id: string;
@@ -34,9 +39,17 @@ export default function OperationsPage() {
   const t = useTranslations('operations');
   const tCommon = useTranslations('common');
   const { toast } = useToast();
+  const locale = useLocale();
+  const router = useRouter();
+  const { isAdmin } = useCurrentUser();
+
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fetchBatches = useCallback(async () => {
     try {
@@ -61,6 +74,62 @@ export default function OperationsPage() {
     setDialogOpen(false);
     fetchBatches();
     toast({ title: tCommon('success') });
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`/api/v1/operations/${deleteId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        toast({ title: tCommon('success') });
+        setDeleteId(null);
+        fetchBatches();
+      } else {
+        toast({ title: tCommon('error'), variant: 'destructive' });
+      }
+    } catch {
+      toast({ title: tCommon('error'), variant: 'destructive' });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleBulkDelete = (rows: Batch[]) => {
+    setBulkDeleteIds(rows.map((r) => r.id));
+  };
+
+  const confirmBulkDelete = async () => {
+    setDeleteLoading(true);
+    try {
+      await Promise.all(
+        bulkDeleteIds.map((id) =>
+          fetch(`/api/v1/operations/${id}`, { method: 'DELETE' })
+        )
+      );
+      toast({ title: tCommon('success') });
+      setBulkDeleteIds([]);
+      fetchBatches();
+    } catch {
+      toast({ title: tCommon('error'), variant: 'destructive' });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleExport = () => {
+    exportToCsv('operations', batches, [
+      { key: 'batchNumber', header: t('batchNumber') },
+      { key: 'date', header: tCommon('date') },
+      { key: 'status', header: t('batchStatus') },
+      { key: 'totalInputQty', header: t('inputQty') },
+      { key: 'totalOutputQty', header: t('outputQty') },
+      { key: 'lossRatio', header: t('lossRatio') },
+      { key: 'totalCost', header: t('totalCost') },
+      { key: 'costPerKg', header: t('costPerKg') },
+    ]);
   };
 
   const columns: ColumnDef<Batch>[] = [
@@ -109,6 +178,34 @@ export default function OperationsPage() {
         <StatusBadge status={row.getValue('status')} type="batch" />
       ),
     },
+    ...(isAdmin
+      ? [
+          {
+            id: 'actions',
+            header: tCommon('actions'),
+            cell: ({ row }: { row: { original: Batch } }) => (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() =>
+                    router.push(`/${locale}/operations/${row.original.id}/edit`)
+                  }
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setDeleteId(row.original.id)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            ),
+          } as ColumnDef<Batch>,
+        ]
+      : []),
   ];
 
   if (loading) {
@@ -132,7 +229,14 @@ export default function OperationsPage() {
         }
       />
 
-      <DataTable columns={columns} data={batches} searchColumn="batchNumber" />
+      <DataTable
+        columns={columns}
+        data={batches}
+        searchColumn="batchNumber"
+        enableSelection={isAdmin}
+        onBulkDelete={isAdmin ? handleBulkDelete : undefined}
+        onExport={handleExport}
+      />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -142,6 +246,26 @@ export default function OperationsPage() {
           <OperationForm onSuccess={handleSuccess} onCancel={() => setDialogOpen(false)} />
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={(open) => { if (!open) setDeleteId(null); }}
+        title={tCommon('confirmDelete')}
+        description={tCommon('confirmDeleteDescription')}
+        onConfirm={handleDelete}
+        variant="destructive"
+        loading={deleteLoading}
+      />
+
+      <ConfirmDialog
+        open={bulkDeleteIds.length > 0}
+        onOpenChange={(open) => { if (!open) setBulkDeleteIds([]); }}
+        title={tCommon('confirmDelete')}
+        description={tCommon('confirmBulkDeleteDescription')}
+        onConfirm={confirmBulkDelete}
+        variant="destructive"
+        loading={deleteLoading}
+      />
     </div>
   );
 }

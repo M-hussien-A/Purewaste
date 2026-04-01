@@ -24,6 +24,9 @@
     "success": "تمت العملية بنجاح",
     "error": "حدث خطأ",
     "deleteConfirm": "هل أنت متأكد من الحذف؟",
+    "deleteConfirmMessage": "هذا الإجراء لا يمكن التراجع عنه. سيتم حذف هذا السجل نهائياً.",
+    "bulkDeleteConfirm": "هل أنت متأكد من حذف {count} سجل؟",
+    "bulkDeleteConfirmMessage": "هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع السجلات المحددة نهائياً.",
     "yes": "نعم",
     "no": "لا",
     "page": "صفحة",
@@ -43,7 +46,11 @@
     "reset": "إعادة تعيين",
     "view": "عرض",
     "details": "التفاصيل",
-    "print": "طباعة"
+    "print": "طباعة",
+    "selected": "محدد",
+    "bulkDelete": "حذف المحدد",
+    "exportCsv": "تصدير CSV",
+    "password": "كلمة المرور"
   },
   "auth": {
     "login": "تسجيل الدخول",
@@ -199,7 +206,15 @@
     "transactionType": "نوع العملية",
     "debit": "مدين",
     "credit": "دائن",
-    "runningBalance": "الرصيد الجاري"
+    "runningBalance": "الرصيد الجاري",
+    "nameAr": "الاسم بالعربي",
+    "nameEn": "الاسم بالإنجليزي",
+    "phone": "الهاتف",
+    "address": "العنوان",
+    "description": "الوصف",
+    "viewLedger": "كشف حساب",
+    "outstandingBalance": "الرصيد المستحق",
+    "totalReceived": "إجمالي المقبوضات"
   },
   "payments": {
     "title": "المدفوعات",

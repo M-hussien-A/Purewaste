@@ -17,6 +17,9 @@ import {
 } from '@/components/ui/dialog';
 import { PurchaseForm } from '@/components/forms/PurchaseForm';
 import { useToast } from '@/components/ui/use-toast';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { exportToCsv } from '@/lib/export-csv';
 
 interface Purchase {
   id: string;
@@ -25,7 +28,7 @@ interface Purchase {
   description: string | null;
   supplierId: string | null;
   materialId: string | null;
-  supplier: { name: string } | null;
+  supplier: { name: string; nameAr: string } | null;
   material: { name: string } | null;
   quantity: number;
   unitPrice: number;
@@ -37,10 +40,14 @@ export default function PurchasesPage() {
   const t = useTranslations('purchases');
   const tCommon = useTranslations('common');
   const { toast } = useToast();
+  const { isAdmin } = useCurrentUser();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPurchase, setEditingPurchase] = useState<Purchase | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fetchPurchases = useCallback(async () => {
     try {
@@ -74,15 +81,55 @@ export default function PurchasesPage() {
   };
 
   const handleDelete = async (id: string) => {
+    setDeleteLoading(true);
     try {
       const res = await fetch(`/api/v1/purchases/${id}`, { method: 'DELETE' });
       if (res.ok) {
         fetchPurchases();
+        setDeleteId(null);
         toast({ title: tCommon('success') });
       }
     } catch {
       toast({ title: tCommon('error'), variant: 'destructive' });
+    } finally {
+      setDeleteLoading(false);
     }
+  };
+
+  const handleBulkDelete = async (rows: Purchase[]) => {
+    setBulkDeleteIds(rows.map((r) => r.id));
+  };
+
+  const confirmBulkDelete = async () => {
+    setDeleteLoading(true);
+    try {
+      await Promise.all(
+        bulkDeleteIds.map((id) =>
+          fetch(`/api/v1/purchases/${id}`, { method: 'DELETE' })
+        )
+      );
+      fetchPurchases();
+      setBulkDeleteIds([]);
+      toast({ title: tCommon('success') });
+    } catch {
+      toast({ title: tCommon('error'), variant: 'destructive' });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleExport = () => {
+    exportToCsv('purchases', purchases, [
+      { key: 'date', header: tCommon('date') },
+      { key: 'category', header: t('category') },
+      { key: 'supplier.nameAr', header: t('supplier') },
+      { key: 'material.name', header: t('item') },
+      { key: 'description', header: t('description') },
+      { key: 'quantity', header: t('quantity') },
+      { key: 'unitPrice', header: t('unitPrice') },
+      { key: 'totalCost', header: t('totalCost') },
+      { key: 'paymentStatus', header: t('paymentStatus') },
+    ]);
   };
 
   const columns: ColumnDef<Purchase>[] = [
@@ -145,20 +192,24 @@ export default function PurchasesPage() {
       header: tCommon('actions'),
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleEdit(row.original)}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleDelete(row.original.id)}
-          >
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
+          {isAdmin && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleEdit(row.original)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+          {isAdmin && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setDeleteId(row.original.id)}
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          )}
         </div>
       ),
     },
@@ -190,7 +241,14 @@ export default function PurchasesPage() {
         }
       />
 
-      <DataTable columns={columns} data={purchases} searchColumn="supplierName" />
+      <DataTable
+        columns={columns}
+        data={purchases}
+        searchColumn="supplierName"
+        enableSelection={isAdmin}
+        onBulkDelete={isAdmin ? handleBulkDelete : undefined}
+        onExport={handleExport}
+      />
 
       <Dialog
         open={dialogOpen}
@@ -215,6 +273,30 @@ export default function PurchasesPage() {
           />
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={(open) => {
+          if (!open) setDeleteId(null);
+        }}
+        title={tCommon('confirmDelete')}
+        description={tCommon('confirmDeleteDescription')}
+        onConfirm={() => deleteId && handleDelete(deleteId)}
+        variant="destructive"
+        loading={deleteLoading}
+      />
+
+      <ConfirmDialog
+        open={bulkDeleteIds.length > 0}
+        onOpenChange={(open) => {
+          if (!open) setBulkDeleteIds([]);
+        }}
+        title={tCommon('confirmDelete')}
+        description={tCommon('confirmBulkDeleteDescription')}
+        onConfirm={confirmBulkDelete}
+        variant="destructive"
+        loading={deleteLoading}
+      />
     </div>
   );
 }

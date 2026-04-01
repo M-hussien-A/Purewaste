@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { AlertTriangle } from 'lucide-react';
+import { exportToCsv } from '@/lib/export-csv';
 
 export default function FinishedProductsPage() {
   const t = useTranslations('inventory');
@@ -84,6 +85,16 @@ export default function FinishedProductsPage() {
     }
   };
 
+  const handleExport = () => {
+    exportToCsv('finished-products', products, [
+      { key: 'nameAr', header: t('name') },
+      { key: 'currentStock', header: t('currentStock') },
+      { key: 'minStockLevel', header: t('minStockLevel') },
+      { key: 'avgCostPerKg', header: t('avgCostPerKg') },
+      { key: 'unit', header: tCommon('unit') },
+    ]);
+  };
+
   const columns: ColumnDef<any>[] = [
     { accessorKey: 'nameAr', header: t('name') },
     { accessorKey: 'category', header: t('category') },
@@ -131,7 +142,7 @@ export default function FinishedProductsPage() {
   return (
     <div>
       <PageHeader title={t('finishedProducts')} />
-      <DataTable columns={columns} data={products} loading={loading} />
+      <DataTable columns={columns} data={products} loading={loading} onExport={handleExport} />
       <Dialog open={showAdjustment} onOpenChange={setShowAdjustment}>
         <DialogContent>
           <DialogHeader>

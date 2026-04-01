@@ -24,6 +24,9 @@
     "success": "Operation completed successfully",
     "error": "An error occurred",
     "deleteConfirm": "Are you sure you want to delete?",
+    "deleteConfirmMessage": "This action cannot be undone. This record will be permanently deleted.",
+    "bulkDeleteConfirm": "Are you sure you want to delete {count} records?",
+    "bulkDeleteConfirmMessage": "This action cannot be undone. All selected records will be permanently deleted.",
     "yes": "Yes",
     "no": "No",
     "page": "Page",
@@ -43,7 +46,11 @@
     "reset": "Reset",
     "view": "View",
     "details": "Details",
-    "print": "Print"
+    "print": "Print",
+    "selected": "selected",
+    "bulkDelete": "Delete Selected",
+    "exportCsv": "Export CSV",
+    "password": "Password"
   },
   "auth": {
     "login": "Login",
@@ -199,7 +206,15 @@
     "transactionType": "Transaction Type",
     "debit": "Debit",
     "credit": "Credit",
-    "runningBalance": "Running Balance"
+    "runningBalance": "Running Balance",
+    "nameAr": "Name (Arabic)",
+    "nameEn": "Name (English)",
+    "phone": "Phone",
+    "address": "Address",
+    "description": "Description",
+    "viewLedger": "View Ledger",
+    "outstandingBalance": "Outstanding Balance",
+    "totalReceived": "Total Received"
   },
   "payments": {
     "title": "Payments",
