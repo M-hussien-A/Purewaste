@@ -37,8 +37,10 @@ const operationSchema = z.object({
       })
     )
     .min(1),
+  workerIds: z.array(z.string()),
   electricityHrs: z.number().min(0),
   laborHrs: z.number().min(0),
+  fuelCost: z.number().min(0),
   otherExpenses: z.number().min(0),
 });
 
@@ -53,6 +55,13 @@ interface Material {
 interface Product {
   id: string;
   name: string;
+}
+
+interface Worker {
+  id: string;
+  name: string;
+  nameAr: string;
+  costPerKg: number;
 }
 
 interface Settings {
@@ -72,6 +81,7 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
   const { toast } = useToast();
   const [materials, setMaterials] = useState<Material[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [workers, setWorkers] = useState<Worker[]>([]);
   const [settings, setSettings] = useState<Settings>({
     electricityRate: 0,
     laborRate: 0,
@@ -92,8 +102,10 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
       date: new Date().toISOString().split('T')[0],
       inputMaterials: [{ materialId: '', quantity: 0 }],
       outputProducts: [{ productId: '', quantity: 0 }],
+      workerIds: [],
       electricityHrs: 0,
       laborHrs: 0,
+      fuelCost: 0,
       otherExpenses: 0,
     },
   });
@@ -115,17 +127,21 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
       fetch('/api/v1/inventory/raw').then((r) => r.json()),
       fetch('/api/v1/inventory/finished').then((r) => r.json()),
       fetch('/api/v1/settings').then((r) => r.json()),
-    ]).then(([matRes, prodRes, settRes]) => {
+      fetch('/api/v1/labor').then((r) => r.json()),
+    ]).then(([matRes, prodRes, settRes, workersRes]) => {
       setMaterials(matRes.data || []);
       setProducts(prodRes.data || []);
       if (settRes.data) setSettings(settRes.data);
+      setWorkers(workersRes.data || []);
     });
   }, []);
 
   const watchedInputs = watch('inputMaterials');
   const watchedOutputs = watch('outputProducts');
+  const watchedWorkerIds = watch('workerIds');
   const watchedElectricity = watch('electricityHrs');
   const watchedLabor = watch('laborHrs');
+  const watchedFuel = watch('fuelCost');
   const watchedOther = watch('otherExpenses');
 
   const calculations = useMemo(() => {
@@ -144,10 +160,18 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
       return sum + (Number(item.quantity) || 0) * (mat?.avgCostPerKg || 0);
     }, 0);
 
+    // Labor cost = sum of selected workers' costPerKg * totalOutput
+    const laborCostPerKg = (watchedWorkerIds || []).reduce((sum, wId) => {
+      const w = workers.find((w) => w.id === wId);
+      return sum + (w ? Number(w.costPerKg) : 0);
+    }, 0);
+    const laborCost = laborCostPerKg * totalOutput;
+
     const electricityCost = (Number(watchedElectricity) || 0) * settings.electricityRate;
-    const laborCost = (Number(watchedLabor) || 0) * settings.laborRate;
+    const fuelCost = Number(watchedFuel) || 0;
+    const otherExpenses = Number(watchedOther) || 0;
     const operatingCost =
-      electricityCost + laborCost + (Number(watchedOther) || 0) + settings.monthlyMaintenance;
+      electricityCost + laborCost + fuelCost + otherExpenses + settings.monthlyMaintenance;
     const totalCost = materialCost + operatingCost;
     const costPerKg = totalOutput > 0 ? totalCost / totalOutput : 0;
 
@@ -156,11 +180,13 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
       totalOutput,
       lossRatio,
       materialCost,
+      laborCost,
+      fuelCost,
       operatingCost,
       totalCost,
       costPerKg,
     };
-  }, [watchedInputs, watchedOutputs, watchedElectricity, watchedLabor, watchedOther, materials, settings]);
+  }, [watchedInputs, watchedOutputs, watchedWorkerIds, watchedElectricity, watchedLabor, watchedFuel, watchedOther, materials, workers, settings]);
 
   const onSubmit = async (data: OperationFormValues) => {
     try {
@@ -310,8 +336,49 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
         ))}
       </div>
 
+      {/* Workers Selection */}
+      <div className="space-y-3">
+        <Label className="text-base font-semibold">{t('workers')}</Label>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {workers.map((w) => {
+            const isSelected = (watchedWorkerIds || []).includes(w.id);
+            return (
+              <label
+                key={w.id}
+                className={`flex cursor-pointer items-center gap-2 rounded-lg border p-3 transition-colors ${
+                  isSelected ? 'border-primary bg-primary/5' : 'border-border'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={(e) => {
+                    const current = watchedWorkerIds || [];
+                    if (e.target.checked) {
+                      setValue('workerIds', [...current, w.id]);
+                    } else {
+                      setValue('workerIds', current.filter((id: string) => id !== w.id));
+                    }
+                  }}
+                  className="h-4 w-4"
+                />
+                <div>
+                  <span className="text-sm font-medium">{w.nameAr || w.name}</span>
+                  <span className="ms-1 text-xs text-muted-foreground">
+                    ({Number(w.costPerKg).toFixed(2)} {tCommon('currency')}/{tCommon('kg')})
+                  </span>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+        {workers.length === 0 && (
+          <p className="text-sm text-muted-foreground">{t('noWorkers')}</p>
+        )}
+      </div>
+
       {/* Operating Costs */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div className="space-y-2">
           <Label>{t('electricityHrs')}</Label>
           <Input type="number" step="0.1" {...register('electricityHrs', { valueAsNumber: true })} />
@@ -319,6 +386,10 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
         <div className="space-y-2">
           <Label>{t('laborHrs')}</Label>
           <Input type="number" step="0.1" {...register('laborHrs', { valueAsNumber: true })} />
+        </div>
+        <div className="space-y-2">
+          <Label>{t('fuelCost')}</Label>
+          <Input type="number" step="0.01" {...register('fuelCost', { valueAsNumber: true })} />
         </div>
         <div className="space-y-2">
           <Label>{t('otherExpenses')}</Label>
@@ -348,6 +419,16 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
           <span className="text-muted-foreground">{t('materialCost')}:</span>
           <span className="text-end font-medium">
             {calculations.materialCost.toLocaleString()} {tCommon('currency')}
+          </span>
+
+          <span className="text-muted-foreground">{t('laborCost')}:</span>
+          <span className="text-end font-medium">
+            {calculations.laborCost.toLocaleString()} {tCommon('currency')}
+          </span>
+
+          <span className="text-muted-foreground">{t('fuelCost')}:</span>
+          <span className="text-end font-medium">
+            {calculations.fuelCost.toLocaleString()} {tCommon('currency')}
           </span>
 
           <span className="text-muted-foreground">{t('operatingCost')}:</span>

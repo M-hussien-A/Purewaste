@@ -14,8 +14,10 @@ export const smeltingBatchSchema = z.object({
       quantity: z.coerce.number().positive('Quantity must be a positive number'),
     })
   ).min(1, 'At least one output product is required'),
+  workerIds: z.array(z.string()).default([]),
   electricityHrs: z.coerce.number().min(0, 'Electricity hours cannot be negative'),
   laborHrs: z.coerce.number().min(0, 'Labor hours cannot be negative'),
+  fuelCost: z.coerce.number().min(0, 'Fuel cost cannot be negative').default(0),
   otherExpenses: z.coerce.number().min(0, 'Other expenses cannot be negative'),
   notes: z.string().optional(),
 });

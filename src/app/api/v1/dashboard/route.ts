@@ -137,6 +137,30 @@ export async function GET(request: NextRequest) {
       return current.minus(previous).div(previous).mul(100).toDecimalPlaces(2).toNumber();
     };
 
+    // Cost breakdown from batches in current period
+    const totalLaborCost = currentPeriodBatches.reduce(
+      (sum, b) => sum.plus(new Decimal((b as any).laborCost?.toString() || '0')),
+      new Decimal(0)
+    );
+    const totalFuelCost = currentPeriodBatches.reduce(
+      (sum, b) => sum.plus(new Decimal((b as any).fuelCost?.toString() || '0')),
+      new Decimal(0)
+    );
+    const totalMaterialCost = currentPeriodBatches.reduce(
+      (sum, b) => sum.plus(new Decimal(b.materialCost.toString())),
+      new Decimal(0)
+    );
+    const totalOtherCost = currentPeriodBatches.reduce(
+      (sum, b) => {
+        const operating = new Decimal(b.operatingCost.toString());
+        const labor = new Decimal((b as any).laborCost?.toString() || '0');
+        const fuel = new Decimal((b as any).fuelCost?.toString() || '0');
+        // other = operating - labor - fuel (electricity + other expenses)
+        return sum.plus(operating.minus(labor).minus(fuel));
+      },
+      new Decimal(0)
+    );
+
     // Chart data
     const revenueChartData = recentSales.map((s) => ({
       date: s.date.toISOString().split('T')[0],
@@ -174,6 +198,12 @@ export async function GET(request: NextRequest) {
           value: currentAvgLoss.toDecimalPlaces(4).toNumber(),
           change: pctChange(currentAvgLoss, prevAvgLoss),
         },
+      },
+      costBreakdown: {
+        labor: totalLaborCost.toNumber(),
+        fuel: totalFuelCost.toNumber(),
+        material: totalMaterialCost.toNumber(),
+        other: totalOtherCost.toNumber(),
       },
       charts: {
         revenue: revenueChartData,

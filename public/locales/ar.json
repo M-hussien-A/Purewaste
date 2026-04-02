@@ -99,7 +99,12 @@
     "thisWeek": "هذا الأسبوع",
     "thisMonth": "هذا الشهر",
     "weeklyRevenue": "إيرادات الأسبوع",
-    "weeklyProfit": "أرباح الأسبوع"
+    "weeklyProfit": "أرباح الأسبوع",
+    "costBreakdown": "تفصيل التكاليف",
+    "laborCost": "تكلفة العمالة",
+    "fuelCost": "تكلفة الوقود",
+    "materialCost": "تكلفة المواد",
+    "otherCost": "تكاليف أخرى"
   },
   "operations": {
     "title": "عمليات الصهر",
@@ -128,7 +133,11 @@
     "maintenanceAlloc": "تخصيص الصيانة",
     "costSummary": "ملخص التكاليف",
     "editBatch": "تعديل الصهرة",
-    "batchDetails": "تفاصيل الصهرة"
+    "batchDetails": "تفاصيل الصهرة",
+    "workers": "العمالة",
+    "noWorkers": "لا يوجد عمال. أضف عمال من صفحة العمالة أولاً",
+    "laborCost": "تكلفة العمالة",
+    "fuelCost": "تكلفة الوقود"
   },
   "purchases": {
     "title": "المشتريات",

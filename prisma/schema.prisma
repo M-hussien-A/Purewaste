@@ -227,6 +227,8 @@ model SmeltingBatch {
   laborHrs        Decimal     @default(0) @db.Decimal(8, 2)
   otherExpenses   Decimal     @default(0) @db.Decimal(14, 2)
   materialCost    Decimal     @db.Decimal(14, 2)
+  laborCost       Decimal     @default(0) @db.Decimal(14, 2)
+  fuelCost        Decimal     @default(0) @db.Decimal(14, 2)
   operatingCost   Decimal     @db.Decimal(14, 2)
   maintenanceAlloc Decimal    @default(0) @db.Decimal(14, 2)
   totalCost       Decimal     @db.Decimal(14, 2)
@@ -238,6 +240,7 @@ model SmeltingBatch {
 
   inputs  BatchInput[]
   outputs BatchOutput[]
+  workers BatchWorker[]
   sales   Sale[]
   creator User @relation("BatchCreator", fields: [createdBy], references: [id])
 
@@ -264,6 +267,16 @@ model BatchOutput {
 
   batch   SmeltingBatch   @relation(fields: [batchId], references: [id], onDelete: Cascade)
   product FinishedProduct @relation(fields: [productId], references: [id])
+}
+
+model BatchWorker {
+  id        String  @id @default(cuid())
+  batchId   String
+  workerId  String
+  costPerKg Decimal @db.Decimal(12, 4)
+
+  batch  SmeltingBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  worker Worker       @relation(fields: [workerId], references: [id])
 }
 
 model Sale {
@@ -356,6 +369,7 @@ model Worker {
   updatedAt    DateTime @updatedAt
 
   transactions LaborTransaction[]
+  batches      BatchWorker[]
 }
 
 model LaborTransaction {

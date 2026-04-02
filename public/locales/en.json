@@ -99,7 +99,12 @@
     "thisWeek": "This Week",
     "thisMonth": "This Month",
     "weeklyRevenue": "Weekly Revenue",
-    "weeklyProfit": "Weekly Profit"
+    "weeklyProfit": "Weekly Profit",
+    "costBreakdown": "Cost Breakdown",
+    "laborCost": "Labor Cost",
+    "fuelCost": "Fuel Cost",
+    "materialCost": "Material Cost",
+    "otherCost": "Other Costs"
   },
   "operations": {
     "title": "Smelting Operations",
@@ -128,7 +133,11 @@
     "maintenanceAlloc": "Maintenance Allocation",
     "costSummary": "Cost Summary",
     "editBatch": "Edit Batch",
-    "batchDetails": "Batch Details"
+    "batchDetails": "Batch Details",
+    "workers": "Workers",
+    "noWorkers": "No workers found. Add workers from the Labor page first",
+    "laborCost": "Labor Cost",
+    "fuelCost": "Fuel Cost"
   },
   "purchases": {
     "title": "Purchases",

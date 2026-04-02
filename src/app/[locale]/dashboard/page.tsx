@@ -10,13 +10,21 @@ import { LossRatioChart } from '@/components/dashboard/LossRatioChart';
 import { AlertsPanel } from '@/components/dashboard/AlertsPanel';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Package, TrendingUp, DollarSign, Percent } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Package, TrendingUp, DollarSign, Percent, HardHat, Fuel, Wrench, Layers } from 'lucide-react';
 
 interface KPI {
   value: number;
   change: number;
   rawStock?: number;
   finishedStock?: number;
+}
+
+interface CostBreakdown {
+  labor: number;
+  fuel: number;
+  material: number;
+  other: number;
 }
 
 interface DashboardData {
@@ -29,6 +37,7 @@ interface DashboardData {
     monthlyProfit: KPI;
     avgLossRatio: KPI;
   };
+  costBreakdown: CostBreakdown;
   charts: {
     revenue: Array<{ date: string; revenue: number; profit: number }>;
     batches: Array<{ batch: number; date: string; lossRatio: number; totalCost: number }>;
@@ -144,6 +153,61 @@ export default function DashboardPage() {
           icon={Percent}
         />
       </div>
+
+      {/* Cost Breakdown */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-base">{t('costBreakdown')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="flex items-center gap-3 rounded-lg border p-4">
+              <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900">
+                <HardHat className="h-5 w-5 text-blue-600 dark:text-blue-300" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t('laborCost')}</p>
+                <p className="text-lg font-bold">
+                  {(data?.costBreakdown?.labor || 0).toLocaleString()} <span className="text-xs font-normal">{tCommon('currency')}</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 rounded-lg border p-4">
+              <div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-900">
+                <Fuel className="h-5 w-5 text-orange-600 dark:text-orange-300" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t('fuelCost')}</p>
+                <p className="text-lg font-bold">
+                  {(data?.costBreakdown?.fuel || 0).toLocaleString()} <span className="text-xs font-normal">{tCommon('currency')}</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 rounded-lg border p-4">
+              <div className="rounded-lg bg-green-100 p-2 dark:bg-green-900">
+                <Layers className="h-5 w-5 text-green-600 dark:text-green-300" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t('materialCost')}</p>
+                <p className="text-lg font-bold">
+                  {(data?.costBreakdown?.material || 0).toLocaleString()} <span className="text-xs font-normal">{tCommon('currency')}</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 rounded-lg border p-4">
+              <div className="rounded-lg bg-gray-100 p-2 dark:bg-gray-800">
+                <Wrench className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t('otherCost')}</p>
+                <p className="text-lg font-bold">
+                  {(data?.costBreakdown?.other || 0).toLocaleString()} <span className="text-xs font-normal">{tCommon('currency')}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Charts */}
       <div className="mb-6 grid gap-6 lg:grid-cols-2">

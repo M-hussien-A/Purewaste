@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       return errorResponse('VALIDATION_ERROR', 'Invalid input', validation.error.flatten(), 400);
     }
 
-    const { date, inputMaterials: inputs, outputProducts: outputs, electricityHrs, laborHrs, otherExpenses, notes } = validation.data;
+    const { date, inputMaterials: inputs, outputProducts: outputs, workerIds, electricityHrs, laborHrs, fuelCost, otherExpenses, notes } = validation.data;
 
     const result = await prisma.$transaction(async (tx) => {
       // Get system settings for rates
@@ -131,14 +131,26 @@ export async function POST(request: NextRequest) {
         totalOutputQty = totalOutputQty.plus(new Decimal(output.quantity));
       }
 
-      // Calculate operating cost
-      const operatingCost = calculateOperatingCost(
-        electricityHrs,
-        settings.electricityRate.toString(),
-        laborHrs,
-        settings.laborRate.toString(),
-        otherExpenses
-      );
+      // Fetch selected workers and calculate labor cost from costPerKg
+      let laborCostFromWorkers = new Decimal(0);
+      const workerRecords: Array<{ workerId: string; costPerKg: Decimal }> = [];
+      if (workerIds && workerIds.length > 0) {
+        const selectedWorkers = await tx.worker.findMany({
+          where: { id: { in: workerIds } },
+        });
+        for (const w of selectedWorkers) {
+          const wpk = new Decimal(w.costPerKg.toString());
+          laborCostFromWorkers = laborCostFromWorkers.plus(wpk.mul(totalOutputQty));
+          workerRecords.push({ workerId: w.id, costPerKg: wpk });
+        }
+      }
+
+      // Calculate operating cost (includes laborHrs*rate + worker-based labor + fuel + other)
+      const electricityCost = new Decimal(electricityHrs).mul(new Decimal(settings.electricityRate.toString()));
+      const laborHrsCost = new Decimal(laborHrs).mul(new Decimal(settings.laborRate.toString()));
+      const totalLaborCost = laborHrsCost.plus(laborCostFromWorkers);
+      const fuelCostDec = new Decimal(fuelCost || 0);
+      const operatingCost = electricityCost.plus(totalLaborCost).plus(fuelCostDec).plus(new Decimal(otherExpenses));
 
       // Calculate maintenance allocation: monthlyMaintenance / batchCount this month
       const batchDate = new Date(date);
@@ -168,6 +180,8 @@ export async function POST(request: NextRequest) {
           laborHrs,
           otherExpenses,
           materialCost: materialCost.toNumber(),
+          laborCost: totalLaborCost.toNumber(),
+          fuelCost: fuelCostDec.toNumber(),
           operatingCost: operatingCost.toNumber(),
           maintenanceAlloc: maintenanceAlloc.toNumber(),
           totalCost: totalCost.toNumber(),
@@ -188,10 +202,17 @@ export async function POST(request: NextRequest) {
               costPerKg: costPerKg.toNumber(),
             })),
           },
+          workers: {
+            create: workerRecords.map((wr) => ({
+              workerId: wr.workerId,
+              costPerKg: wr.costPerKg.toNumber(),
+            })),
+          },
         },
         include: {
           inputs: { include: { material: true } },
           outputs: { include: { product: true } },
+          workers: { include: { worker: true } },
         },
       });
 
