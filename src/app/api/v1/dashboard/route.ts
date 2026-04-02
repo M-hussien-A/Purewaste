@@ -6,19 +6,19 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import Decimal from 'decimal.js';
 export const dynamic = 'force-dynamic';
 
-function getWeekBounds(now: Date): { start: Date; end: Date } {
-  // Monday-Sunday week
-  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-  const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysFromMonday);
-  const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6, 23, 59, 59, 999);
-  return { start: monday, end: sunday };
+function getWeekBounds(now: Date, weekStartDay: number = 6): { start: Date; end: Date } {
+  // weekStartDay: 0=Sun, 1=Mon, ..., 6=Sat (default Saturday)
+  const dayOfWeek = now.getDay();
+  const daysFromStart = (dayOfWeek - weekStartDay + 7) % 7;
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysFromStart);
+  const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6, 23, 59, 59, 999);
+  return { start, end };
 }
 
 function getPrevWeekBounds(currentStart: Date): { start: Date; end: Date } {
-  const prevMonday = new Date(currentStart.getFullYear(), currentStart.getMonth(), currentStart.getDate() - 7);
-  const prevSunday = new Date(prevMonday.getFullYear(), prevMonday.getMonth(), prevMonday.getDate() + 6, 23, 59, 59, 999);
-  return { start: prevMonday, end: prevSunday };
+  const prevStart = new Date(currentStart.getFullYear(), currentStart.getMonth(), currentStart.getDate() - 7);
+  const prevEnd = new Date(prevStart.getFullYear(), prevStart.getMonth(), prevStart.getDate() + 6, 23, 59, 59, 999);
+  return { start: prevStart, end: prevEnd };
 }
 
 export async function GET(request: NextRequest) {
@@ -35,6 +35,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') === 'week' ? 'week' : 'month';
 
+    // Fetch weekStartDay from settings
+    const settings = await prisma.systemSettings.findUnique({ where: { id: 'system' } });
+    const weekStartDay = (settings as any)?.weekStartDay ?? 6;
+
     const now = new Date();
 
     let periodStart: Date;
@@ -43,7 +47,7 @@ export async function GET(request: NextRequest) {
     let prevPeriodEnd: Date;
 
     if (period === 'week') {
-      const current = getWeekBounds(now);
+      const current = getWeekBounds(now, weekStartDay);
       const previous = getPrevWeekBounds(current.start);
       periodStart = current.start;
       periodEnd = current.end;
@@ -195,6 +199,8 @@ export async function GET(request: NextRequest) {
       totalCost: Number(b.totalCost),
     }));
 
+    const totalCosts = totalMaterialCost.plus(totalLaborCost).plus(totalFuelCost).plus(totalOtherCost).plus(totalDailyExpenses).plus(totalMonthlyOverhead);
+
     return successResponse({
       period,
       periodStart: periodStart.toISOString().split('T')[0],
@@ -226,6 +232,7 @@ export async function GET(request: NextRequest) {
         other: totalOtherCost.toNumber(),
         dailyExpenses: totalDailyExpenses.toNumber(),
         monthlyOverhead: totalMonthlyOverhead.toNumber(),
+        total: totalCosts.toNumber(),
       },
       charts: {
         revenue: revenueChartData,

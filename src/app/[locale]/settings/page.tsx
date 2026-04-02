@@ -11,6 +11,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Save } from 'lucide-react';
 
 const settingsSchema = z.object({
@@ -19,6 +26,7 @@ const settingsSchema = z.object({
   monthlyMaintenance: z.number().min(0),
   foundryName: z.string().min(1),
   foundryNameEn: z.string().optional(),
+  weekStartDay: z.number().min(0).max(6),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -34,6 +42,8 @@ export default function SettingsPage() {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -43,6 +53,7 @@ export default function SettingsPage() {
       monthlyMaintenance: 0,
       foundryName: '',
       foundryNameEn: '',
+      weekStartDay: 6,
     },
   });
 
@@ -113,6 +124,26 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label>{t('foundryNameEn')}</Label>
                 <Input {...register('foundryNameEn')} />
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>{t('weekStartDay')}</Label>
+                <Select
+                  value={String(watch('weekStartDay'))}
+                  onValueChange={(v) => setValue('weekStartDay', Number(v))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="6">{t('saturday')}</SelectItem>
+                    <SelectItem value="0">{t('sunday')}</SelectItem>
+                    <SelectItem value="1">{t('monday')}</SelectItem>
+                    <SelectItem value="5">{t('friday')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

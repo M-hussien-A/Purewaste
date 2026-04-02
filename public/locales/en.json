@@ -109,7 +109,8 @@
     "materialCost": "Material Cost",
     "otherCost": "Other Costs",
     "dailyExpenses": "Daily Expenses",
-    "monthlyOverhead": "Monthly Overhead"
+    "monthlyOverhead": "Monthly Overhead",
+    "totalCosts": "Total Costs"
   },
   "operations": {
     "title": "Smelting Operations",
@@ -328,6 +329,11 @@
     "monthlyMaintenance": "Monthly Maintenance",
     "foundryName": "Foundry Name",
     "foundryNameEn": "Foundry Name (English)",
+    "weekStartDay": "Week Start Day",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "monday": "Monday",
+    "friday": "Friday",
     "defaultLanguage": "Default Language",
     "defaultTheme": "Default Theme",
     "perHour": "per hour",
@@ -394,7 +400,8 @@
     "balance": "Remaining Balance",
     "amount": "Amount",
     "transactionType": "Transaction Type",
-    "history": "Transaction History"
+    "history": "Transaction History",
+    "totalLaborCost": "Total Labor Cost"
   },
   "theme": {
     "light": "Light Mode",

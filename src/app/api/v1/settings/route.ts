@@ -57,6 +57,7 @@ export async function PUT(request: NextRequest) {
       defaultTheme,
       foundryName,
       foundryNameEn,
+      weekStartDay,
     } = body;
 
     const existing = await prisma.systemSettings.findUnique({
@@ -74,6 +75,7 @@ export async function PUT(request: NextRequest) {
         ...(defaultTheme !== undefined && { defaultTheme }),
         ...(foundryName !== undefined && { foundryName }),
         ...(foundryNameEn !== undefined && { foundryNameEn }),
+        ...(weekStartDay !== undefined && { weekStartDay: Number(weekStartDay) }),
       },
       update: {
         ...(electricityRate !== undefined && { electricityRate: new Decimal(electricityRate) }),
@@ -83,6 +85,7 @@ export async function PUT(request: NextRequest) {
         ...(defaultTheme !== undefined && { defaultTheme }),
         ...(foundryName !== undefined && { foundryName }),
         ...(foundryNameEn !== undefined && { foundryNameEn }),
+        ...(weekStartDay !== undefined && { weekStartDay: Number(weekStartDay) }),
       },
     });
 

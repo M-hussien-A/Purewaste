@@ -11,7 +11,7 @@ import { AlertsPanel } from '@/components/dashboard/AlertsPanel';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, TrendingUp, DollarSign, Percent, HardHat, Fuel, Wrench, Layers, CalendarDays, CalendarRange } from 'lucide-react';
+import { Package, TrendingUp, DollarSign, Percent, HardHat, Fuel, Wrench, Layers, CalendarDays, CalendarRange, Calculator } from 'lucide-react';
 
 interface KPI {
   value: number;
@@ -27,6 +27,7 @@ interface CostBreakdown {
   other: number;
   dailyExpenses: number;
   monthlyOverhead: number;
+  total: number;
 }
 
 interface DashboardData {
@@ -126,7 +127,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <KPICard
           title={t('totalInventory')}
           value={kpis.totalInventory.value.toLocaleString()}
@@ -147,6 +148,12 @@ export default function DashboardPage() {
           unit={tCommon('currency')}
           change={kpis.monthlyProfit.change}
           icon={DollarSign}
+        />
+        <KPICard
+          title={t('totalCosts')}
+          value={(data?.costBreakdown?.total || 0).toLocaleString()}
+          unit={tCommon('currency')}
+          icon={Calculator}
         />
         <KPICard
           title={t('avgLossRatio')}

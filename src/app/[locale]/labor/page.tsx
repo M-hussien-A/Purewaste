@@ -231,6 +231,7 @@ export default function LaborPage() {
       { key: 'nameAr', header: t('workerName') },
       { key: 'phone', header: tCommon('phone') },
       { key: 'costPerKg', header: t('costPerKg') },
+      { key: 'totalLaborCost', header: t('totalLaborCost') },
       { key: 'totalAdvances', header: t('totalAdvances') },
       { key: 'totalSettlements', header: t('totalSettlements') },
       { key: 'balance', header: t('balance') },
@@ -245,6 +246,12 @@ export default function LaborPage() {
       header: t('costPerKg'),
       cell: ({ row }) =>
         `${Number(row.original.costPerKg || 0).toLocaleString()} ${tCommon('currency')}`,
+    },
+    {
+      accessorKey: 'totalLaborCost',
+      header: t('totalLaborCost'),
+      cell: ({ row }) =>
+        `${Number(row.original.totalLaborCost || 0).toLocaleString()} ${tCommon('currency')}`,
     },
     {
       accessorKey: 'totalAdvances',

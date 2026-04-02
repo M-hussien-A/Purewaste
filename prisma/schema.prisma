@@ -450,5 +450,6 @@ model SystemSettings {
   defaultTheme      String  @default("light")
   foundryName       String  @default("المسبك")
   foundryNameEn     String  @default("The Foundry")
+  weekStartDay      Int     @default(6) // 0=Sunday, 1=Monday, ..., 6=Saturday
   updatedAt         DateTime @updatedAt
 }

@@ -25,6 +25,13 @@ export async function GET(request: NextRequest) {
         transactions: {
           orderBy: { date: 'desc' },
         },
+        batches: {
+          include: {
+            batch: {
+              select: { totalOutputQty: true },
+            },
+          },
+        },
       },
     });
 
@@ -42,11 +49,21 @@ export async function GET(request: NextRequest) {
 
       const balance = totalAdvances.minus(totalSettlements);
 
+      // Calculate total labor cost from batch assignments
+      let totalLaborCost = new Decimal(0);
+      for (const bw of (worker as any).batches || []) {
+        const costPerKg = new Decimal(bw.costPerKg?.toString() || '0');
+        const outputQty = new Decimal(bw.batch?.totalOutputQty?.toString() || '0');
+        totalLaborCost = totalLaborCost.plus(costPerKg.mul(outputQty));
+      }
+
+      const { batches, ...workerWithoutBatches } = worker as any;
       return {
-        ...worker,
+        ...workerWithoutBatches,
         totalAdvances: totalAdvances.toNumber(),
         totalSettlements: totalSettlements.toNumber(),
         balance: balance.toNumber(),
+        totalLaborCost: totalLaborCost.toNumber(),
       };
     });
 

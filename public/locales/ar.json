@@ -109,7 +109,8 @@
     "materialCost": "تكلفة المواد",
     "otherCost": "تكاليف أخرى",
     "dailyExpenses": "المصاريف اليومية",
-    "monthlyOverhead": "المصاريف الشهرية"
+    "monthlyOverhead": "المصاريف الشهرية",
+    "totalCosts": "إجمالي التكاليف"
   },
   "operations": {
     "title": "عمليات الصهر",
@@ -328,6 +329,11 @@
     "monthlyMaintenance": "الصيانة الشهرية",
     "foundryName": "اسم المسبك",
     "foundryNameEn": "اسم المسبك (إنجليزي)",
+    "weekStartDay": "بداية الأسبوع",
+    "saturday": "السبت",
+    "sunday": "الأحد",
+    "monday": "الاثنين",
+    "friday": "الجمعة",
     "defaultLanguage": "اللغة الافتراضية",
     "defaultTheme": "المظهر الافتراضي",
     "perHour": "لكل ساعة",
@@ -394,7 +400,8 @@
     "balance": "الرصيد المتبقي",
     "amount": "المبلغ",
     "transactionType": "نوع العملية",
-    "history": "سجل الحركات"
+    "history": "سجل الحركات",
+    "totalLaborCost": "إجمالي تكلفة العمالة"
   },
   "theme": {
     "light": "وضع فاتح",
