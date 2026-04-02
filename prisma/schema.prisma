@@ -398,7 +398,7 @@ model LaborTransaction {
 
 model ExpenseCategory {
   id        String              @id @default(cuid())
-  name      String
+  name      String              @unique
   nameAr    String
   type      ExpenseCategoryType
   isActive  Boolean             @default(true)

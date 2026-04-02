@@ -297,6 +297,9 @@ export async function GET() {
       data: { date: new Date('2026-03-28'), type: 'RECEIVABLE', amount: 240, method: 'CASH', customerId: customer1.id, saleId: sale4.id, createdBy: admin.id },
     });
 
+    // 11. Expense Categories
+    await seedExpenseCategories();
+
     return NextResponse.json({
       success: true,
       message: 'Database seeded successfully!',
@@ -308,6 +311,50 @@ export async function GET() {
     });
   } catch (error: any) {
     console.error('Seed error:', error);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+async function seedExpenseCategories() {
+  const dailyCategories = [
+    { name: 'Maintenance & Repairs', nameAr: 'صيانة وإصلاحات', type: 'DAILY' as const },
+    { name: 'Transport & Delivery', nameAr: 'نقل وتوصيل', type: 'DAILY' as const },
+    { name: 'Food & Beverages', nameAr: 'طعام ومشروبات', type: 'DAILY' as const },
+    { name: 'Miscellaneous', nameAr: 'متنوعات', type: 'DAILY' as const },
+    { name: 'Tools & Supplies', nameAr: 'أدوات ومستلزمات', type: 'DAILY' as const },
+  ];
+
+  const monthlyCategories = [
+    { name: 'Rent', nameAr: 'إيجار', type: 'MONTHLY' as const },
+    { name: 'Electricity Bill', nameAr: 'فاتورة كهرباء', type: 'MONTHLY' as const },
+    { name: 'Environment Fees', nameAr: 'رسوم بيئية', type: 'MONTHLY' as const },
+    { name: 'Security', nameAr: 'أمن وحراسة', type: 'MONTHLY' as const },
+    { name: 'Insurance', nameAr: 'تأمين', type: 'MONTHLY' as const },
+  ];
+
+  const allCategories = [...dailyCategories, ...monthlyCategories];
+
+  for (const cat of allCategories) {
+    await prisma.expenseCategory.upsert({
+      where: { name: cat.name },
+      update: { nameAr: cat.nameAr, type: cat.type },
+      create: cat,
+    });
+  }
+
+  return allCategories.length;
+}
+
+// POST: Seed only expense categories (works even if DB already has users)
+export async function POST() {
+  try {
+    const count = await seedExpenseCategories();
+    return NextResponse.json({
+      success: true,
+      message: `Seeded ${count} expense categories successfully!`,
+    });
+  } catch (error: any) {
+    console.error('Seed categories error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
