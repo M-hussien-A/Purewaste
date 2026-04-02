@@ -78,7 +78,10 @@
     "settings": "Settings",
     "users": "User Management",
     "auditLog": "Audit Log",
-    "labor": "Labor"
+    "labor": "Labor",
+    "expenses": "Expenses",
+    "dailyExpenses": "Daily Expenses",
+    "monthlyOverhead": "Monthly Overhead"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -104,7 +107,9 @@
     "laborCost": "Labor Cost",
     "fuelCost": "Fuel Cost",
     "materialCost": "Material Cost",
-    "otherCost": "Other Costs"
+    "otherCost": "Other Costs",
+    "dailyExpenses": "Daily Expenses",
+    "monthlyOverhead": "Monthly Overhead"
   },
   "operations": {
     "title": "Smelting Operations",
@@ -262,7 +267,7 @@
     "from": "From",
     "to": "To",
     "totalRevenue": "Total Revenue",
-    "totalCosts": "Total Costs",
+    "totalCosts": "Total Direct Costs",
     "netProfit": "Net Profit",
     "profitMargin": "Profit Margin",
     "startDate": "Start Date",
@@ -271,7 +276,19 @@
     "batchBreakdown": "Breakdown by Batch",
     "batch": "Batch",
     "noBatch": "No Batch",
-    "salesCount": "sales"
+    "salesCount": "sales",
+    "pnlTitle": "Profit & Loss Report",
+    "revenue": "Revenue",
+    "directCosts": "Direct Costs (Smelting Costs)",
+    "grossProfit": "Gross Profit",
+    "grossMargin": "Gross Margin",
+    "periodCosts": "Period Costs",
+    "dailyExpenses": "Daily Expenses",
+    "monthlyOverhead": "Monthly Overhead",
+    "totalDailyExpenses": "Total Daily Expenses",
+    "totalMonthlyOverhead": "Total Monthly Overhead",
+    "totalPeriodCosts": "Total Period Costs",
+    "netMargin": "Net Profit Margin"
   },
   "alerts": {
     "lowStock": "Low stock: {name} ({current} kg, minimum: {min} kg)",
@@ -339,6 +356,25 @@
       "EXPORT": "Export",
       "PASSWORD_CHANGE": "Password Change"
     }
+  },
+  "expenses": {
+    "dailyTitle": "Daily Expenses",
+    "monthlyTitle": "Monthly Overhead",
+    "addExpense": "Add Expense",
+    "addOverhead": "Add Monthly Overhead",
+    "category": "Category",
+    "description": "Description",
+    "descriptionPlaceholder": "e.g. Furnace repair, scrap transport",
+    "amount": "Amount",
+    "from": "From",
+    "to": "To",
+    "todayTotal": "Today's Total",
+    "monthToDate": "Month-to-Date",
+    "periodTotal": "Period Total",
+    "monthTotal": "Month Total",
+    "month": "Month",
+    "year": "Year",
+    "addRow": "Add Row"
   },
   "labor": {
     "title": "Labor",

@@ -17,6 +17,8 @@ export type Module =
   | 'users'
   | 'audit_log'
   | 'labor'
+  | 'expenses_daily'
+  | 'expenses_monthly'
   | 'settings';
 
 export type Action = 'create' | 'read' | 'update' | 'delete';
@@ -39,6 +41,8 @@ const ALL_MODULES: Module[] = [
   'pdf_reports',
   'users',
   'labor',
+  'expenses_daily',
+  'expenses_monthly',
   'audit_log',
   'settings',
 ];
@@ -66,6 +70,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Permissions> = {
     dashboard: ['read'],
     pdf_reports: ['read'],
     labor: ['create', 'read', 'update'],
+    expenses_daily: ['create', 'read', 'update'],
+    expenses_monthly: ['read'],
     users: [],
     audit_log: [],
     settings: [],
@@ -86,6 +92,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Permissions> = {
     dashboard: ['read'],
     pdf_reports: ['read'],
     labor: ['create', 'read', 'update'],
+    expenses_daily: ['create', 'read', 'update'],
+    expenses_monthly: ['create', 'read', 'update'],
     users: [],
     audit_log: [],
     settings: [],
@@ -106,6 +114,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Permissions> = {
     dashboard: ['read'],
     pdf_reports: ['read'],
     labor: ['read'],
+    expenses_daily: ['read'],
+    expenses_monthly: ['read'],
     users: [],
     audit_log: [],
     settings: [],

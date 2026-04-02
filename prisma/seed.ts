@@ -503,6 +503,77 @@ async function main() {
   });
 
   console.log('Payments created');
+
+  // Create Expense Categories
+  const dailyCategories = [
+    { name: 'Maintenance', nameAr: 'صيانة', type: 'DAILY' as const },
+    { name: 'Transport', nameAr: 'مواصلات', type: 'DAILY' as const },
+    { name: 'Food & Drinks', nameAr: 'أكل وشرب', type: 'DAILY' as const },
+    { name: 'Miscellaneous', nameAr: 'متنوعة', type: 'DAILY' as const },
+  ];
+  const monthlyCategories = [
+    { name: 'Rent', nameAr: 'إيجار', type: 'MONTHLY' as const },
+    { name: 'Electricity', nameAr: 'كهرباء', type: 'MONTHLY' as const },
+    { name: 'Environment Fees', nameAr: 'بيئة', type: 'MONTHLY' as const },
+    { name: 'Security & Guards', nameAr: 'أمن وحراسة', type: 'MONTHLY' as const },
+  ];
+
+  for (const cat of [...dailyCategories, ...monthlyCategories]) {
+    await prisma.expenseCategory.upsert({
+      where: { id: cat.name.toLowerCase().replace(/[^a-z]/g, '-') },
+      update: {},
+      create: {
+        id: cat.name.toLowerCase().replace(/[^a-z]/g, '-'),
+        ...cat,
+      },
+    });
+  }
+  console.log('Expense categories created');
+
+  // Sample daily expenses
+  const expCats = await prisma.expenseCategory.findMany();
+  const maintenanceCat = expCats.find((c: any) => c.name === 'Maintenance');
+  const transportCat = expCats.find((c: any) => c.name === 'Transport');
+  const foodCat = expCats.find((c: any) => c.name === 'Food & Drinks');
+
+  if (maintenanceCat && transportCat && foodCat) {
+    const sampleExpenses = [
+      { date: new Date('2026-03-10'), categoryId: maintenanceCat.id, description: 'إصلاح فرن', amount: 150, createdBy: admin.id },
+      { date: new Date('2026-03-10'), categoryId: foodCat.id, description: 'غداء عمال', amount: 300, createdBy: admin.id },
+      { date: new Date('2026-03-12'), categoryId: transportCat.id, description: 'نقل خردة', amount: 200, createdBy: admin.id },
+      { date: new Date('2026-03-15'), categoryId: maintenanceCat.id, description: 'قطع غيار', amount: 500, createdBy: admin.id },
+      { date: new Date('2026-03-18'), categoryId: foodCat.id, description: 'أكل وشرب', amount: 250, createdBy: admin.id },
+      { date: new Date('2026-03-20'), categoryId: transportCat.id, description: 'سولار مولد', amount: 400, createdBy: admin.id },
+      { date: new Date('2026-03-22'), categoryId: foodCat.id, description: 'غداء', amount: 200, createdBy: admin.id },
+      { date: new Date('2026-03-25'), categoryId: maintenanceCat.id, description: 'صيانة دورية', amount: 350, createdBy: admin.id },
+    ];
+    await prisma.dailyExpense.createMany({ data: sampleExpenses });
+    console.log('Sample daily expenses created');
+  }
+
+  // Sample monthly overhead
+  const rentCat = expCats.find((c: any) => c.name === 'Rent');
+  const elecCat = expCats.find((c: any) => c.name === 'Electricity');
+  const envCat = expCats.find((c: any) => c.name === 'Environment Fees');
+  const secCat = expCats.find((c: any) => c.name === 'Security & Guards');
+
+  if (rentCat && elecCat && envCat && secCat) {
+    const sampleOverheads = [
+      { month: 3, year: 2026, categoryId: rentCat.id, amount: 15000, createdBy: admin.id },
+      { month: 3, year: 2026, categoryId: elecCat.id, amount: 8500, createdBy: admin.id },
+      { month: 3, year: 2026, categoryId: envCat.id, amount: 2000, createdBy: admin.id },
+      { month: 3, year: 2026, categoryId: secCat.id, amount: 6000, createdBy: admin.id },
+    ];
+    for (const oh of sampleOverheads) {
+      await prisma.monthlyOverhead.upsert({
+        where: { month_year_categoryId: { month: oh.month, year: oh.year, categoryId: oh.categoryId } },
+        update: { amount: oh.amount },
+        create: oh,
+      });
+    }
+    console.log('Sample monthly overheads created');
+  }
+
   console.log('Seed complete!');
 }
 

@@ -11,7 +11,7 @@ import { AlertsPanel } from '@/components/dashboard/AlertsPanel';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, TrendingUp, DollarSign, Percent, HardHat, Fuel, Wrench, Layers } from 'lucide-react';
+import { Package, TrendingUp, DollarSign, Percent, HardHat, Fuel, Wrench, Layers, CalendarDays, CalendarRange } from 'lucide-react';
 
 interface KPI {
   value: number;
@@ -25,6 +25,8 @@ interface CostBreakdown {
   fuel: number;
   material: number;
   other: number;
+  dailyExpenses: number;
+  monthlyOverhead: number;
 }
 
 interface DashboardData {
@@ -160,7 +162,18 @@ export default function DashboardPage() {
           <CardTitle className="text-base">{t('costBreakdown')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="flex items-center gap-3 rounded-lg border p-4">
+              <div className="rounded-lg bg-green-100 p-2 dark:bg-green-900">
+                <Layers className="h-5 w-5 text-green-600 dark:text-green-300" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t('materialCost')}</p>
+                <p className="text-lg font-bold">
+                  {(data?.costBreakdown?.material || 0).toLocaleString()} <span className="text-xs font-normal">{tCommon('currency')}</span>
+                </p>
+              </div>
+            </div>
             <div className="flex items-center gap-3 rounded-lg border p-4">
               <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900">
                 <HardHat className="h-5 w-5 text-blue-600 dark:text-blue-300" />
@@ -184,17 +197,6 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-lg border p-4">
-              <div className="rounded-lg bg-green-100 p-2 dark:bg-green-900">
-                <Layers className="h-5 w-5 text-green-600 dark:text-green-300" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">{t('materialCost')}</p>
-                <p className="text-lg font-bold">
-                  {(data?.costBreakdown?.material || 0).toLocaleString()} <span className="text-xs font-normal">{tCommon('currency')}</span>
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 rounded-lg border p-4">
               <div className="rounded-lg bg-gray-100 p-2 dark:bg-gray-800">
                 <Wrench className="h-5 w-5 text-gray-600 dark:text-gray-300" />
               </div>
@@ -202,6 +204,28 @@ export default function DashboardPage() {
                 <p className="text-xs text-muted-foreground">{t('otherCost')}</p>
                 <p className="text-lg font-bold">
                   {(data?.costBreakdown?.other || 0).toLocaleString()} <span className="text-xs font-normal">{tCommon('currency')}</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 rounded-lg border p-4">
+              <div className="rounded-lg bg-purple-100 p-2 dark:bg-purple-900">
+                <CalendarDays className="h-5 w-5 text-purple-600 dark:text-purple-300" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t('dailyExpenses')}</p>
+                <p className="text-lg font-bold">
+                  {(data?.costBreakdown?.dailyExpenses || 0).toLocaleString()} <span className="text-xs font-normal">{tCommon('currency')}</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 rounded-lg border p-4">
+              <div className="rounded-lg bg-red-100 p-2 dark:bg-red-900">
+                <CalendarRange className="h-5 w-5 text-red-600 dark:text-red-300" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t('monthlyOverhead')}</p>
+                <p className="text-lg font-bold">
+                  {(data?.costBreakdown?.monthlyOverhead || 0).toLocaleString()} <span className="text-xs font-normal">{tCommon('currency')}</span>
                 </p>
               </div>
             </div>

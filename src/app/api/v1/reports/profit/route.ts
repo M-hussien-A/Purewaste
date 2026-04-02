@@ -96,6 +96,50 @@ export async function GET(request: NextRequest) {
       grossProfit: b.grossProfit,
     }));
 
+    // Daily expenses in the date range
+    const dailyExpensesInRange = await prisma.dailyExpense.findMany({
+      where: dateFilter,
+      include: { category: true },
+    });
+
+    const totalDailyExpenses = dailyExpensesInRange.reduce(
+      (sum, e) => sum.plus(new Decimal(e.amount.toString())),
+      new Decimal(0)
+    );
+
+    // Group daily expenses by category
+    const dailyByCategory = new Map<string, { name: string; nameAr: string; total: Decimal }>();
+    for (const exp of dailyExpensesInRange) {
+      const key = exp.categoryId;
+      if (!dailyByCategory.has(key)) {
+        dailyByCategory.set(key, {
+          name: exp.category.name,
+          nameAr: exp.category.nameAr,
+          total: new Decimal(0),
+        });
+      }
+      const entry = dailyByCategory.get(key)!;
+      entry.total = entry.total.plus(new Decimal(exp.amount.toString()));
+    }
+
+    // Monthly overhead for the month
+    const startDate = new Date(dateFrom);
+    const monthlyOverheads = await prisma.monthlyOverhead.findMany({
+      where: {
+        month: startDate.getMonth() + 1,
+        year: startDate.getFullYear(),
+      },
+      include: { category: true },
+    });
+
+    const totalMonthlyOverhead = monthlyOverheads.reduce(
+      (sum, o) => sum.plus(new Decimal(o.amount.toString())),
+      new Decimal(0)
+    );
+
+    const totalPeriodCosts = totalDailyExpenses.plus(totalMonthlyOverhead);
+    const netProfit = totalGrossProfit.minus(totalPeriodCosts);
+
     return successResponse({
       dateFrom,
       dateTo,
@@ -103,11 +147,28 @@ export async function GET(request: NextRequest) {
         totalRevenue,
         totalCosts,
         grossProfit: totalGrossProfit,
-        salesCount: salesAgg._count,
-        profitMargin: totalRevenue.gt(0)
+        grossMargin: totalRevenue.gt(0)
           ? totalGrossProfit.div(totalRevenue).mul(100).toDecimalPlaces(2)
           : new Decimal(0),
+        totalDailyExpenses,
+        totalMonthlyOverhead,
+        totalPeriodCosts,
+        netProfit,
+        netMargin: totalRevenue.gt(0)
+          ? netProfit.div(totalRevenue).mul(100).toDecimalPlaces(2)
+          : new Decimal(0),
+        salesCount: salesAgg._count,
       },
+      dailyExpenseBreakdown: Array.from(dailyByCategory.values()).map((c) => ({
+        name: c.name,
+        nameAr: c.nameAr,
+        total: c.total,
+      })),
+      monthlyOverheadBreakdown: monthlyOverheads.map((o) => ({
+        name: o.category.name,
+        nameAr: o.category.nameAr,
+        total: o.amount,
+      })),
       batchBreakdown,
     });
   } catch (error) {

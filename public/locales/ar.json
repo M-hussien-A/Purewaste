@@ -78,7 +78,10 @@
     "settings": "الإعدادات",
     "users": "إدارة المستخدمين",
     "auditLog": "سجل المراجعة",
-    "labor": "العمالة"
+    "labor": "العمالة",
+    "expenses": "المصاريف",
+    "dailyExpenses": "مصاريف يومية",
+    "monthlyOverhead": "مصاريف شهرية"
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -104,7 +107,9 @@
     "laborCost": "تكلفة العمالة",
     "fuelCost": "تكلفة الوقود",
     "materialCost": "تكلفة المواد",
-    "otherCost": "تكاليف أخرى"
+    "otherCost": "تكاليف أخرى",
+    "dailyExpenses": "المصاريف اليومية",
+    "monthlyOverhead": "المصاريف الشهرية"
   },
   "operations": {
     "title": "عمليات الصهر",
@@ -262,7 +267,7 @@
     "from": "من",
     "to": "إلى",
     "totalRevenue": "إجمالي الإيرادات",
-    "totalCosts": "إجمالي التكاليف",
+    "totalCosts": "إجمالي التكاليف المباشرة",
     "netProfit": "صافي الربح",
     "profitMargin": "هامش الربح",
     "startDate": "من تاريخ",
@@ -271,7 +276,19 @@
     "batchBreakdown": "تفصيل حسب الصهرة",
     "batch": "صهرة",
     "noBatch": "بدون صهرة",
-    "salesCount": "عملية بيع"
+    "salesCount": "عملية بيع",
+    "pnlTitle": "تقرير الأرباح والخسائر",
+    "revenue": "الإيرادات",
+    "directCosts": "التكاليف المباشرة (تكاليف الصهر)",
+    "grossProfit": "مجمل الربح",
+    "grossMargin": "هامش الربح الإجمالي",
+    "periodCosts": "تكاليف الفترة",
+    "dailyExpenses": "المصاريف اليومية",
+    "monthlyOverhead": "المصاريف الشهرية",
+    "totalDailyExpenses": "إجمالي المصاريف اليومية",
+    "totalMonthlyOverhead": "إجمالي المصاريف الشهرية",
+    "totalPeriodCosts": "إجمالي تكاليف الفترة",
+    "netMargin": "هامش صافي الربح"
   },
   "alerts": {
     "lowStock": "مخزون منخفض: {name} ({current} كجم، الحد الأدنى: {min} كجم)",
@@ -339,6 +356,25 @@
       "EXPORT": "تصدير",
       "PASSWORD_CHANGE": "تغيير كلمة المرور"
     }
+  },
+  "expenses": {
+    "dailyTitle": "مصاريف يومية",
+    "monthlyTitle": "مصاريف شهرية",
+    "addExpense": "إضافة مصروف",
+    "addOverhead": "إضافة مصروف شهري",
+    "category": "التصنيف",
+    "description": "الوصف",
+    "descriptionPlaceholder": "مثال: صيانة فرن - مواصلات خردة",
+    "amount": "المبلغ",
+    "from": "من",
+    "to": "إلى",
+    "todayTotal": "إجمالي اليوم",
+    "monthToDate": "إجمالي الشهر حتى الآن",
+    "periodTotal": "إجمالي الفترة",
+    "monthTotal": "إجمالي الشهر",
+    "month": "الشهر",
+    "year": "السنة",
+    "addRow": "إضافة سطر"
   },
   "labor": {
     "title": "العمالة",

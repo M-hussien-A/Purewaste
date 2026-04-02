@@ -161,6 +161,26 @@ export async function GET(request: NextRequest) {
       new Decimal(0)
     );
 
+    // Period costs: daily expenses + monthly overhead
+    const dailyExpenses = await prisma.dailyExpense.findMany({
+      where: { date: { gte: periodStart, lte: periodEnd } },
+    });
+    const totalDailyExpenses = dailyExpenses.reduce(
+      (sum, e) => sum.plus(new Decimal(e.amount.toString())),
+      new Decimal(0)
+    );
+
+    const now2 = new Date();
+    const monthlyOverheads = await prisma.monthlyOverhead.findMany({
+      where: period === 'month'
+        ? { month: now2.getMonth() + 1, year: now2.getFullYear() }
+        : { month: now2.getMonth() + 1, year: now2.getFullYear() },
+    });
+    const totalMonthlyOverhead = monthlyOverheads.reduce(
+      (sum, o) => sum.plus(new Decimal(o.amount.toString())),
+      new Decimal(0)
+    );
+
     // Chart data
     const revenueChartData = recentSales.map((s) => ({
       date: s.date.toISOString().split('T')[0],
@@ -204,6 +224,8 @@ export async function GET(request: NextRequest) {
         fuel: totalFuelCost.toNumber(),
         material: totalMaterialCost.toNumber(),
         other: totalOtherCost.toNumber(),
+        dailyExpenses: totalDailyExpenses.toNumber(),
+        monthlyOverhead: totalMonthlyOverhead.toNumber(),
       },
       charts: {
         revenue: revenueChartData,

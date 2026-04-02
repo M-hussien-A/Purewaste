@@ -88,6 +88,8 @@ model User {
   createdSales       Sale[]           @relation("SaleCreator")
   createdPayments    Payment[]        @relation("PaymentCreator")
   inventoryMovements InventoryMovement[]
+  dailyExpenses      DailyExpense[]     @relation("ExpenseCreator")
+  monthlyOverheads   MonthlyOverhead[]  @relation("OverheadCreator")
 }
 
 model Session {
@@ -358,6 +360,11 @@ enum LaborTransactionType {
   SETTLEMENT
 }
 
+enum ExpenseCategoryType {
+  DAILY
+  MONTHLY
+}
+
 model Worker {
   id           String  @id @default(cuid())
   name         String
@@ -387,6 +394,51 @@ model LaborTransaction {
 
   @@index([workerId])
   @@index([date])
+}
+
+model ExpenseCategory {
+  id        String              @id @default(cuid())
+  name      String
+  nameAr    String
+  type      ExpenseCategoryType
+  isActive  Boolean             @default(true)
+  createdAt DateTime            @default(now())
+
+  dailyExpenses    DailyExpense[]
+  monthlyOverheads MonthlyOverhead[]
+}
+
+model DailyExpense {
+  id          String   @id @default(cuid())
+  date        DateTime
+  categoryId  String
+  description String?
+  amount      Decimal  @db.Decimal(14, 2)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category ExpenseCategory @relation(fields: [categoryId], references: [id])
+  creator  User            @relation("ExpenseCreator", fields: [createdBy], references: [id])
+
+  @@index([date])
+}
+
+model MonthlyOverhead {
+  id         String  @id @default(cuid())
+  month      Int
+  year       Int
+  categoryId String
+  amount     Decimal @db.Decimal(14, 2)
+  notes      String?
+  createdBy  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  category ExpenseCategory @relation(fields: [categoryId], references: [id])
+  creator  User            @relation("OverheadCreator", fields: [createdBy], references: [id])
+
+  @@unique([month, year, categoryId])
 }
 
 model SystemSettings {
