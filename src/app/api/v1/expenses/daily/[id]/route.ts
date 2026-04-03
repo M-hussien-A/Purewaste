@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { checkPermission } from '@/lib/rbac';
 import { logAction } from '@/lib/audit';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import Decimal from 'decimal.js';
 export const dynamic = 'force-dynamic';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -33,7 +34,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
         ...(body.date && { date: new Date(body.date) }),
         ...(body.categoryId && { categoryId: body.categoryId }),
         ...(body.description !== undefined && { description: body.description }),
-        ...(body.amount !== undefined && { amount: parseFloat(body.amount) }),
+        ...(body.amount !== undefined && { amount: new Decimal(body.amount.toString()) }),
       },
     });
 

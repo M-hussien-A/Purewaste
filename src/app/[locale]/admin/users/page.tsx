@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/shared/PageHeader';
@@ -24,6 +24,7 @@ import { useToast } from '@/components/ui/use-toast';
 export default function UsersPage() {
   const t = useTranslations('users');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
   const router = useRouter();
   const { toast } = useToast();
   const { isAdmin } = useCurrentUser();
@@ -152,7 +153,7 @@ export default function UsersPage() {
                   variant="ghost"
                   size="icon"
                   onClick={() =>
-                    router.push(`/admin/users/${row.original.id}/edit`)
+                    router.push(`/${locale}/admin/users/${row.original.id}/edit`)
                   }
                   title={tCommon('edit')}
                 >

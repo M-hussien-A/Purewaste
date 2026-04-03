@@ -70,7 +70,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     const result = await prisma.$transaction(async (tx) => {
       const existing = await tx.sale.findUniqueOrThrow({ where: { id } });
 
-      // Reverse old inventory: add back to stock
+      // Reverse old inventory: add back to OLD product's stock
       await tx.finishedProduct.update({
         where: { id: existing.productId },
         data: { currentStock: { increment: existing.quantity } },
@@ -82,13 +82,16 @@ export async function PUT(request: NextRequest, context: RouteContext) {
         const batch = await tx.smeltingBatch.findUniqueOrThrow({ where: { id: batchId } });
         costPerKg = new Decimal(batch.costPerKg.toString());
       } else {
-        const product = await tx.finishedProduct.findUniqueOrThrow({ where: { id: productId } });
-        costPerKg = new Decimal(product.avgCostPerKg.toString());
+        // Re-fetch the NEW product (after old stock was reversed)
+        const prodForCost = await tx.finishedProduct.findUniqueOrThrow({ where: { id: productId } });
+        costPerKg = new Decimal(prodForCost.avgCostPerKg.toString());
       }
 
-      // Check sufficient stock for new quantity
+      // Check sufficient stock on the NEW product
       const product = await tx.finishedProduct.findUniqueOrThrow({ where: { id: productId } });
       const saleQty = new Decimal(quantity);
+      // If same product, stock was already incremented above, so available = current stock
+      // If different product, stock reflects actual available quantity
       if (new Decimal(product.currentStock.toString()).lt(saleQty)) {
         throw new Error(`Insufficient stock for ${product.name}. Available: ${product.currentStock}, Requested: ${quantity}`);
       }

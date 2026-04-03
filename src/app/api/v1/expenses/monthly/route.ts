@@ -68,14 +68,14 @@ export async function POST(request: NextRequest) {
         month_year_categoryId: { month, year, categoryId },
       },
       update: {
-        amount: parseFloat(amount),
+        amount: new Decimal(amount.toString()),
         notes: notes || null,
       },
       create: {
         month,
         year,
         categoryId,
-        amount: parseFloat(amount),
+        amount: new Decimal(amount.toString()),
         notes: notes || null,
         createdBy: userId,
       },

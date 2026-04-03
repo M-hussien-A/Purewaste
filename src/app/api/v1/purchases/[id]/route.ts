@@ -70,7 +70,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     const result = await prisma.$transaction(async (tx) => {
       const existing = await tx.purchase.findUniqueOrThrow({ where: { id } });
 
-      // Reverse old inventory effect if it was a raw material purchase
+      // Reverse old inventory effect on the OLD material
       if (existing.materialId) {
         await tx.rawMaterial.update({
           where: { id: existing.materialId },
@@ -80,7 +80,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
         });
       }
 
-      // Apply new inventory effect if new purchase is raw material
+      // Apply new inventory effect on the NEW material
       if (isRawMaterial) {
         const material = await tx.rawMaterial.findUniqueOrThrow({ where: { id: materialId } });
         const newAvgCost = calculateWeightedAverage(

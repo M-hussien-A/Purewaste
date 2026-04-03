@@ -174,11 +174,11 @@ export async function GET(request: NextRequest) {
       new Decimal(0)
     );
 
+    // For monthly period: fetch overheads for current month
+    // For weekly period: prorate current month's overheads by week fraction
     const now2 = new Date();
     const monthlyOverheads = await prisma.monthlyOverhead.findMany({
-      where: period === 'month'
-        ? { month: now2.getMonth() + 1, year: now2.getFullYear() }
-        : { month: now2.getMonth() + 1, year: now2.getFullYear() },
+      where: { month: now2.getMonth() + 1, year: now2.getFullYear() },
     });
     const totalMonthlyOverhead = monthlyOverheads.reduce(
       (sum, o) => sum.plus(new Decimal(o.amount.toString())),

@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
             date: new Date(entry.date),
             categoryId: entry.categoryId,
             description: entry.description || null,
-            amount: parseFloat(entry.amount),
+            amount: new Decimal(entry.amount.toString()),
             createdBy: userId,
           },
         })
