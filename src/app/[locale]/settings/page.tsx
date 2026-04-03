@@ -115,7 +115,7 @@ export default function SettingsPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>{t('foundryName')}</Label>
+                <Label>{t('foundryName')} <span className="text-destructive">*</span></Label>
                 <Input {...register('foundryName')} />
                 {errors.foundryName && (
                   <p className="text-sm text-destructive">{tCommon('required')}</p>
@@ -129,7 +129,7 @@ export default function SettingsPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>{t('weekStartDay')}</Label>
+                <Label>{t('weekStartDay')} <span className="text-destructive">*</span></Label>
                 <Select
                   value={String(watch('weekStartDay'))}
                   onValueChange={(v) => setValue('weekStartDay', Number(v))}
@@ -149,21 +149,21 @@ export default function SettingsPage() {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label>{t('electricityRate')}</Label>
+                <Label>{t('electricityRate')} <span className="text-destructive">*</span></Label>
                 <Input type="number" step="0.01" {...register('electricityRate', { valueAsNumber: true })} />
                 {errors.electricityRate && (
                   <p className="text-sm text-destructive">{tCommon('required')}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label>{t('laborRate')}</Label>
+                <Label>{t('laborRate')} <span className="text-destructive">*</span></Label>
                 <Input type="number" step="0.01" {...register('laborRate', { valueAsNumber: true })} />
                 {errors.laborRate && (
                   <p className="text-sm text-destructive">{tCommon('required')}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label>{t('monthlyMaintenance')}</Label>
+                <Label>{t('monthlyMaintenance')} <span className="text-destructive">*</span></Label>
                 <Input type="number" step="0.01" {...register('monthlyMaintenance', { valueAsNumber: true })} />
                 {errors.monthlyMaintenance && (
                   <p className="text-sm text-destructive">{tCommon('required')}</p>

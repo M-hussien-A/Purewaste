@@ -150,7 +150,7 @@ export function PurchaseForm({ initialData, onSuccess, onCancel }: PurchaseFormP
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>{tCommon('date')}</Label>
+          <Label>{tCommon('date')} <span className="text-destructive">*</span></Label>
           <Input type="date" {...register('date')} />
           {errors.date && (
             <p className="text-sm text-destructive">{tCommon('required')}</p>
@@ -158,7 +158,7 @@ export function PurchaseForm({ initialData, onSuccess, onCancel }: PurchaseFormP
         </div>
 
         <div className="space-y-2">
-          <Label>{t('category')}</Label>
+          <Label>{t('category')} <span className="text-destructive">*</span></Label>
           <Select
             value={watchedCategory}
             onValueChange={(val) => setValue('category', val as typeof PURCHASE_CATEGORIES[number])}
@@ -179,7 +179,7 @@ export function PurchaseForm({ initialData, onSuccess, onCancel }: PurchaseFormP
 
       {!isRawMaterial && (
         <div className="space-y-2">
-          <Label>{t('description')}</Label>
+          <Label>{t('description')} <span className="text-destructive">*</span></Label>
           <Input {...register('description')} placeholder={t('descriptionPlaceholder')} />
           {errors.description && (
             <p className="text-sm text-destructive">{tCommon('required')}</p>
@@ -214,7 +214,7 @@ export function PurchaseForm({ initialData, onSuccess, onCancel }: PurchaseFormP
 
       {isRawMaterial && (
         <div className="space-y-2">
-          <Label>{t('material')}</Label>
+          <Label>{t('material')} <span className="text-destructive">*</span></Label>
           <Select
             value={watch('materialId') || ''}
             onValueChange={(val) => setValue('materialId', val)}
@@ -238,14 +238,14 @@ export function PurchaseForm({ initialData, onSuccess, onCancel }: PurchaseFormP
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>{t('quantity')}</Label>
+          <Label>{t('quantity')} <span className="text-destructive">*</span></Label>
           <Input type="number" step="0.01" {...register('quantity', { valueAsNumber: true })} />
           {errors.quantity && (
             <p className="text-sm text-destructive">{tCommon('required')}</p>
           )}
         </div>
         <div className="space-y-2">
-          <Label>{t('unitPrice')}</Label>
+          <Label>{t('unitPrice')} <span className="text-destructive">*</span></Label>
           <Input type="number" step="0.01" {...register('unitPrice', { valueAsNumber: true })} />
           {errors.unitPrice && (
             <p className="text-sm text-destructive">{tCommon('required')}</p>

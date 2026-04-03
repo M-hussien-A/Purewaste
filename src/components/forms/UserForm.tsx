@@ -53,17 +53,17 @@ export function UserForm({ onSuccess }: { onSuccess?: () => void }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label>{t('username')}</Label>
+          <Label>{t('username')} <span className="text-destructive">*</span></Label>
           <Input {...register('username')} />
           {errors.username && <p className="text-sm text-destructive">{errors.username.message}</p>}
         </div>
         <div className="space-y-2">
-          <Label>{t('email')}</Label>
+          <Label>{t('email')} <span className="text-destructive">*</span></Label>
           <Input type="email" {...register('email')} />
           {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
         </div>
         <div className="space-y-2">
-          <Label>{t('fullName')}</Label>
+          <Label>{t('fullName')} <span className="text-destructive">*</span></Label>
           <Input {...register('fullName')} />
           {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
         </div>
@@ -72,12 +72,12 @@ export function UserForm({ onSuccess }: { onSuccess?: () => void }) {
           <Input {...register('phone')} />
         </div>
         <div className="space-y-2">
-          <Label>{tCommon('password') || 'Password'}</Label>
+          <Label>{tCommon('password') || 'Password'} <span className="text-destructive">*</span></Label>
           <Input type="password" {...register('password')} />
           {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
         </div>
         <div className="space-y-2">
-          <Label>{t('role')}</Label>
+          <Label>{t('role')} <span className="text-destructive">*</span></Label>
           <Select defaultValue="VIEWER" onValueChange={(v) => setValue('role', v as any)}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>

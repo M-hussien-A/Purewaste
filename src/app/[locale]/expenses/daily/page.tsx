@@ -272,7 +272,7 @@ export default function DailyExpensesPage() {
             {entries.map((entry, index) => (
               <div key={index} className="flex items-end gap-2">
                 <div className="w-36 space-y-1">
-                  <Label className="text-xs">{tCommon('date')}</Label>
+                  <Label className="text-xs">{tCommon('date')} <span className="text-destructive">*</span></Label>
                   <Input
                     type="date"
                     value={entry.date}
@@ -280,7 +280,7 @@ export default function DailyExpensesPage() {
                   />
                 </div>
                 <div className="w-40 space-y-1">
-                  <Label className="text-xs">{t('category')}</Label>
+                  <Label className="text-xs">{t('category')} <span className="text-destructive">*</span></Label>
                   <Select
                     value={entry.categoryId}
                     onValueChange={(v) => updateEntry(index, 'categoryId', v)}
@@ -306,7 +306,7 @@ export default function DailyExpensesPage() {
                   />
                 </div>
                 <div className="w-28 space-y-1">
-                  <Label className="text-xs">{t('amount')}</Label>
+                  <Label className="text-xs">{t('amount')} <span className="text-destructive">*</span></Label>
                   <Input
                     type="number"
                     step="0.01"

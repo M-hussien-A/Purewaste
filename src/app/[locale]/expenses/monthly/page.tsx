@@ -248,7 +248,7 @@ export default function MonthlyOverheadPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>{t('category')}</Label>
+              <Label>{t('category')} <span className="text-destructive">*</span></Label>
               <Select
                 value={formData.categoryId}
                 onValueChange={(v) => setFormData({ ...formData, categoryId: v })}
@@ -266,7 +266,7 @@ export default function MonthlyOverheadPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>{t('amount')}</Label>
+              <Label>{t('amount')} <span className="text-destructive">*</span></Label>
               <Input
                 type="number"
                 step="0.01"

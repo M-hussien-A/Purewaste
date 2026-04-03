@@ -137,7 +137,7 @@ export function SaleForm({ initialData, onSuccess, onCancel }: SaleFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
-        <Label>{tCommon('date')}</Label>
+        <Label>{tCommon('date')} <span className="text-destructive">*</span></Label>
         <Input type="date" {...register('date')} />
         {errors.date && (
           <p className="text-sm text-destructive">{tCommon('required')}</p>
@@ -145,7 +145,7 @@ export function SaleForm({ initialData, onSuccess, onCancel }: SaleFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label>{t('customer')}</Label>
+        <Label>{t('customer')} <span className="text-destructive">*</span></Label>
         <Select
           value={watch('customerId')}
           onValueChange={(val) => setValue('customerId', val)}
@@ -167,7 +167,7 @@ export function SaleForm({ initialData, onSuccess, onCancel }: SaleFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label>{t('product')}</Label>
+        <Label>{t('product')} <span className="text-destructive">*</span></Label>
         <Select
           value={watch('productId')}
           onValueChange={(val) => setValue('productId', val)}
@@ -211,14 +211,14 @@ export function SaleForm({ initialData, onSuccess, onCancel }: SaleFormProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>{t('quantity')}</Label>
+          <Label>{t('quantity')} <span className="text-destructive">*</span></Label>
           <Input type="number" step="0.01" {...register('quantity', { valueAsNumber: true })} />
           {errors.quantity && (
             <p className="text-sm text-destructive">{tCommon('required')}</p>
           )}
         </div>
         <div className="space-y-2">
-          <Label>{t('pricePerKg')}</Label>
+          <Label>{t('pricePerKg')} <span className="text-destructive">*</span></Label>
           <Input type="number" step="0.01" {...register('pricePerKg', { valueAsNumber: true })} />
           {errors.pricePerKg && (
             <p className="text-sm text-destructive">{tCommon('required')}</p>

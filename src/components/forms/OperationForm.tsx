@@ -213,7 +213,7 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Date */}
       <div className="space-y-2">
-        <Label>{tCommon('date')}</Label>
+        <Label>{tCommon('date')} <span className="text-destructive">*</span></Label>
         <Input type="date" {...register('date')} />
         {errors.date && (
           <p className="text-sm text-destructive">{tCommon('required')}</p>
@@ -223,7 +223,7 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
       {/* Input Materials */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="text-base font-semibold">{t('inputMaterials')}</Label>
+          <Label className="text-base font-semibold">{t('inputMaterials')} <span className="text-destructive">*</span></Label>
           <Button
             type="button"
             variant="outline"
@@ -237,7 +237,7 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
         {inputFields.map((field, index) => (
           <div key={field.id} className="flex items-end gap-3">
             <div className="flex-1 space-y-1">
-              <Label>{t('materialType')}</Label>
+              <Label>{t('materialType')} <span className="text-destructive">*</span></Label>
               <Select
                 value={watchedInputs?.[index]?.materialId || ''}
                 onValueChange={(val) =>
@@ -257,7 +257,7 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
               </Select>
             </div>
             <div className="w-32 space-y-1">
-              <Label>{t('inputQty')}</Label>
+              <Label>{t('inputQty')} <span className="text-destructive">*</span></Label>
               <Input
                 type="number"
                 step="0.01"
@@ -281,7 +281,7 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
       {/* Output Products */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="text-base font-semibold">{t('outputProducts')}</Label>
+          <Label className="text-base font-semibold">{t('outputProducts')} <span className="text-destructive">*</span></Label>
           <Button
             type="button"
             variant="outline"
@@ -295,7 +295,7 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
         {outputFields.map((field, index) => (
           <div key={field.id} className="flex items-end gap-3">
             <div className="flex-1 space-y-1">
-              <Label>{t('productType')}</Label>
+              <Label>{t('productType')} <span className="text-destructive">*</span></Label>
               <Select
                 value={watchedOutputs?.[index]?.productId || ''}
                 onValueChange={(val) =>
@@ -315,7 +315,7 @@ export function OperationForm({ onSuccess, onCancel }: OperationFormProps) {
               </Select>
             </div>
             <div className="w-32 space-y-1">
-              <Label>{t('outputQty')}</Label>
+              <Label>{t('outputQty')} <span className="text-destructive">*</span></Label>
               <Input
                 type="number"
                 step="0.01"

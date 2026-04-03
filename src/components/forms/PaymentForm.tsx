@@ -133,7 +133,7 @@ export function PaymentForm({ defaultType = 'PAYABLE', onSuccess, onCancel }: Pa
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>{t('type')}</Label>
+          <Label>{t('type')} <span className="text-destructive">*</span></Label>
           <Select
             value={watchedType}
             onValueChange={(val) => setValue('type', val as 'PAYABLE' | 'RECEIVABLE')}
@@ -148,7 +148,7 @@ export function PaymentForm({ defaultType = 'PAYABLE', onSuccess, onCancel }: Pa
           </Select>
         </div>
         <div className="space-y-2">
-          <Label>{tCommon('date')}</Label>
+          <Label>{tCommon('date')} <span className="text-destructive">*</span></Label>
           <Input type="date" {...register('date')} />
           {errors.date && (
             <p className="text-sm text-destructive">{tCommon('required')}</p>
@@ -244,14 +244,14 @@ export function PaymentForm({ defaultType = 'PAYABLE', onSuccess, onCancel }: Pa
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>{t('amount')}</Label>
+          <Label>{t('amount')} <span className="text-destructive">*</span></Label>
           <Input type="number" step="0.01" {...register('amount', { valueAsNumber: true })} />
           {errors.amount && (
             <p className="text-sm text-destructive">{tCommon('required')}</p>
           )}
         </div>
         <div className="space-y-2">
-          <Label>{t('method')}</Label>
+          <Label>{t('method')} <span className="text-destructive">*</span></Label>
           <Select
             value={watch('method')}
             onValueChange={(val) => setValue('method', val as 'CASH' | 'BANK_TRANSFER' | 'CHECK')}

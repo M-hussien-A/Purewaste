@@ -294,7 +294,7 @@ export default function SuppliersPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>{t('nameAr')}</Label>
+              <Label>{t('nameAr')} <span className="text-destructive">*</span></Label>
               <Input
                 value={formData.nameAr}
                 onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}

@@ -373,7 +373,7 @@ export default function LaborPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>{t('workerName')}</Label>
+              <Label>{t('workerName')} <span className="text-destructive">*</span></Label>
               <Input
                 value={formData.nameAr}
                 onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
@@ -424,7 +424,7 @@ export default function LaborPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>{tCommon('date')}</Label>
+              <Label>{tCommon('date')} <span className="text-destructive">*</span></Label>
               <Input
                 type="date"
                 value={txData.date}
@@ -432,7 +432,7 @@ export default function LaborPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label>{t('transactionType')}</Label>
+              <Label>{t('transactionType')} <span className="text-destructive">*</span></Label>
               <Select
                 value={txData.type}
                 onValueChange={(v) => setTxData({ ...txData, type: v as 'ADVANCE' | 'SETTLEMENT' })}
@@ -447,7 +447,7 @@ export default function LaborPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>{t('amount')}</Label>
+              <Label>{t('amount')} <span className="text-destructive">*</span></Label>
               <Input
                 type="number"
                 step="0.01"
