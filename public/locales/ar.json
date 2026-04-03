@@ -110,7 +110,8 @@
     "otherCost": "تكاليف أخرى",
     "dailyExpenses": "المصاريف اليومية",
     "monthlyOverhead": "المصاريف الشهرية",
-    "totalCosts": "إجمالي التكاليف"
+    "totalCosts": "إجمالي التكاليف",
+    "noAlerts": "لا توجد تنبيهات"
   },
   "operations": {
     "title": "عمليات الصهر",
@@ -139,6 +140,9 @@
     "maintenanceAlloc": "تخصيص الصيانة",
     "costSummary": "ملخص التكاليف",
     "editBatch": "تعديل الصهرة",
+    "statusCompleted": "مكتمل",
+    "statusInProgress": "قيد التنفيذ",
+    "statusCancelled": "ملغي",
     "batchDetails": "تفاصيل الصهرة",
     "workers": "العمالة",
     "noWorkers": "لا يوجد عمال. أضف عمال من صفحة العمالة أولاً",

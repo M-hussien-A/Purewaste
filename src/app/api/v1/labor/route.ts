@@ -47,8 +47,6 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      const balance = totalAdvances.minus(totalSettlements);
-
       // Calculate total labor cost from batch assignments
       let totalLaborCost = new Decimal(0);
       for (const bw of (worker as any).batches || []) {
@@ -56,6 +54,9 @@ export async function GET(request: NextRequest) {
         const outputQty = new Decimal(bw.batch?.totalOutputQty?.toString() || '0');
         totalLaborCost = totalLaborCost.plus(costPerKg.mul(outputQty));
       }
+
+      // Balance = advances - labor cost (what we owe the worker minus what they earned)
+      const balance = totalAdvances.minus(totalLaborCost);
 
       const { batches, ...workerWithoutBatches } = worker as any;
       return {

@@ -110,7 +110,8 @@
     "otherCost": "Other Costs",
     "dailyExpenses": "Daily Expenses",
     "monthlyOverhead": "Monthly Overhead",
-    "totalCosts": "Total Costs"
+    "totalCosts": "Total Costs",
+    "noAlerts": "No alerts"
   },
   "operations": {
     "title": "Smelting Operations",
@@ -139,6 +140,9 @@
     "maintenanceAlloc": "Maintenance Allocation",
     "costSummary": "Cost Summary",
     "editBatch": "Edit Batch",
+    "statusCompleted": "Completed",
+    "statusInProgress": "In Progress",
+    "statusCancelled": "Cancelled",
     "batchDetails": "Batch Details",
     "workers": "Workers",
     "noWorkers": "No workers found. Add workers from the Labor page first",
