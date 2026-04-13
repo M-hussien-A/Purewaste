@@ -25,7 +25,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { exportToCsv } from '@/lib/export-csv';
+import { exportToXlsx } from '@/lib/export-xlsx';
 import { Plus, Trash2 } from 'lucide-react';
 
 interface ExpenseEntry {
@@ -172,7 +172,7 @@ export default function DailyExpensesPage() {
   };
 
   const handleExport = () => {
-    exportToCsv('daily-expenses', expenses, [
+    exportToXlsx('daily-expenses', expenses, [
       { key: 'date', header: tCommon('date') },
       { key: 'category.nameAr', header: t('category') },
       { key: 'description', header: t('description') },

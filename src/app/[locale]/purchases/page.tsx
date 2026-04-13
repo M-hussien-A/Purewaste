@@ -19,7 +19,7 @@ import { PurchaseForm } from '@/components/forms/PurchaseForm';
 import { useToast } from '@/components/ui/use-toast';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import { exportToCsv } from '@/lib/export-csv';
+import { exportToXlsx } from '@/lib/export-xlsx';
 
 interface Purchase {
   id: string;
@@ -119,7 +119,7 @@ export default function PurchasesPage() {
   };
 
   const handleExport = () => {
-    exportToCsv('purchases', purchases, [
+    exportToXlsx('purchases', purchases, [
       { key: 'date', header: tCommon('date') },
       { key: 'category', header: t('category') },
       { key: 'supplier.nameAr', header: t('supplier') },

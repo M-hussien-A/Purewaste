@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { exportToCsv } from '@/lib/export-csv';
+import { exportToXlsx } from '@/lib/export-xlsx';
 import { Pencil, Plus, Trash2, Receipt, DollarSign } from 'lucide-react';
 
 export default function LaborPage() {
@@ -227,7 +227,7 @@ export default function LaborPage() {
   };
 
   const handleExport = () => {
-    exportToCsv('labor', workers, [
+    exportToXlsx('labor', workers, [
       { key: 'nameAr', header: t('workerName') },
       { key: 'phone', header: tCommon('phone') },
       { key: 'costPerKg', header: t('costPerKg') },

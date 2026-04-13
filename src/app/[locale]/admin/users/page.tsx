@@ -18,7 +18,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { UserForm } from '@/components/forms/UserForm';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { exportToCsv } from '@/lib/export-csv';
+import { exportToXlsx } from '@/lib/export-xlsx';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function UsersPage() {
@@ -106,9 +106,9 @@ export default function UsersPage() {
     }
   };
 
-  // CSV export
+  // Excel export
   const handleExport = () => {
-    exportToCsv('users', users, [
+    exportToXlsx('users', users, [
       { key: 'username', header: t('username') },
       { key: 'fullName', header: t('fullName') },
       { key: 'email', header: t('email') },

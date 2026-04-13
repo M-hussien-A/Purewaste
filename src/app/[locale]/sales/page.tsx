@@ -16,7 +16,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { SaleForm } from '@/components/forms/SaleForm';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { exportToCsv } from '@/lib/export-csv';
+import { exportToXlsx } from '@/lib/export-xlsx';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 
 export default function SalesPage() {
@@ -80,7 +80,7 @@ export default function SalesPage() {
   };
 
   const handleExport = () => {
-    exportToCsv('sales', sales, [
+    exportToXlsx('sales', sales, [
       { key: 'date', header: 'Date' },
       { key: 'customer.nameAr', header: 'Customer' },
       { key: 'product.name', header: 'Product' },
