@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PaymentForm } from '@/components/forms/PaymentForm';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { exportToCsv } from '@/lib/export-csv';
+import { exportToXlsx } from '@/lib/export-xlsx';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 
 export default function PaymentsPage() {
@@ -98,7 +98,7 @@ export default function PaymentsPage() {
   };
 
   const handleExport = (data: any[], type: 'PAYABLE' | 'RECEIVABLE') => {
-    exportToCsv(`payments_${type.toLowerCase()}`, data, [
+    exportToXlsx(`payments_${type.toLowerCase()}`, data, [
       { key: 'date', header: tCommon('date') },
       { key: 'type', header: tCommon('type') },
       { key: 'amount', header: t('amount') },

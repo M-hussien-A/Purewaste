@@ -25,7 +25,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { exportToCsv } from '@/lib/export-csv';
+import { exportToXlsx } from '@/lib/export-xlsx';
 import { Plus, Trash2 } from 'lucide-react';
 
 const MONTHS = [
@@ -145,7 +145,7 @@ export default function MonthlyOverheadPage() {
   };
 
   const handleExport = () => {
-    exportToCsv('monthly-overhead', overheads, [
+    exportToXlsx('monthly-overhead', overheads, [
       { key: 'category.nameAr', header: t('category') },
       { key: 'amount', header: t('amount') },
       { key: 'notes', header: tCommon('notes') },

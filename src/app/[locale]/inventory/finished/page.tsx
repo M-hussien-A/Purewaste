@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { AlertTriangle } from 'lucide-react';
-import { exportToCsv } from '@/lib/export-csv';
+import { exportToXlsx } from '@/lib/export-xlsx';
 
 export default function FinishedProductsPage() {
   const t = useTranslations('inventory');
@@ -86,7 +86,7 @@ export default function FinishedProductsPage() {
   };
 
   const handleExport = () => {
-    exportToCsv('finished-products', products, [
+    exportToXlsx('finished-products', products, [
       { key: 'nameAr', header: t('name') },
       { key: 'currentStock', header: t('currentStock') },
       { key: 'minStockLevel', header: t('minStockLevel') },

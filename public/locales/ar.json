@@ -49,7 +49,7 @@
     "print": "طباعة",
     "selected": "محدد",
     "bulkDelete": "حذف المحدد",
-    "exportCsv": "تصدير CSV",
+    "exportExcel": "تصدير إكسل",
     "password": "كلمة المرور"
   },
   "auth": {

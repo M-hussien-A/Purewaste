@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { exportToCsv } from '@/lib/export-csv';
+import { exportToXlsx } from '@/lib/export-xlsx';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 export default function SuppliersPage() {
@@ -159,7 +159,7 @@ export default function SuppliersPage() {
   };
 
   const handleExport = () => {
-    exportToCsv('suppliers', suppliers, [
+    exportToXlsx('suppliers', suppliers, [
       { key: 'nameAr', header: t('nameAr') },
       { key: 'nameEn', header: t('nameEn') },
       { key: 'phone', header: t('phone') },

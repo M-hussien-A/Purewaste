@@ -30,7 +30,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import { exportToCsv } from '@/lib/export-csv';
+import { exportToXlsx } from '@/lib/export-xlsx';
 
 interface Batch {
   id: string;
@@ -178,7 +178,7 @@ export default function OperationsPage() {
   };
 
   const handleExport = () => {
-    exportToCsv('operations', batches, [
+    exportToXlsx('operations', batches, [
       { key: 'batchNumber', header: t('batchNumber') },
       { key: 'date', header: tCommon('date') },
       { key: 'status', header: t('batchStatus') },

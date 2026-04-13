@@ -49,7 +49,7 @@
     "print": "Print",
     "selected": "selected",
     "bulkDelete": "Delete Selected",
-    "exportCsv": "Export CSV",
+    "exportExcel": "Export Excel",
     "password": "Password"
   },
   "auth": {

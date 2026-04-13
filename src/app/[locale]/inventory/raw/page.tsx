@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { Plus, AlertTriangle } from 'lucide-react';
-import { exportToCsv } from '@/lib/export-csv';
+import { exportToXlsx } from '@/lib/export-xlsx';
 
 export default function RawMaterialsPage() {
   const t = useTranslations('inventory');
@@ -86,7 +86,7 @@ export default function RawMaterialsPage() {
   };
 
   const handleExport = () => {
-    exportToCsv('raw-materials', materials, [
+    exportToXlsx('raw-materials', materials, [
       { key: 'nameAr', header: t('name') },
       { key: 'currentStock', header: t('currentStock') },
       { key: 'minStockLevel', header: t('minStockLevel') },
